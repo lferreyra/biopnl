@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile document storing non-sensitive user metadata.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique user identifier matching auth.uid",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "format": "email",
+          "maxLength": 150
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of account creation",
+          "maxLength": 64
+        }
+      },
+      "required": ["userId", "name", "email", "createdAt"]
+    },
+    "SearchRecord": {
+      "title": "SearchRecord",
+      "description": "A search record logged by an authenticated user, capped at maximum 5 most recent records per user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Author UID",
+          "maxLength": 128
+        },
+        "query": {
+          "type": "string",
+          "description": "Search term entered by user",
+          "maxLength": 150
+        },
+        "title": {
+          "type": "string",
+          "description": "Resolved condition or concept title",
+          "maxLength": 150
+        },
+        "resultSummary": {
+          "type": "string",
+          "description": "Brief summary of the knowledge provider response",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["userId", "query", "title", "createdAt", "resultSummary"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User private profile documents"
+    },
+    "/searches/{searchId}": {
+      "schema": "SearchRecord",
+      "description": "User recent searches history capped at 5 items per user"
+    }
+  }
+}

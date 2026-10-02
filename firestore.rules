@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for UserProfile
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'name', 'email', 'createdAt'])
+        && data.keys().hasOnly(['userId', 'name', 'email', 'createdAt'])
+        && data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    // Validation for SearchRecord
+    function isValidSearchRecord(data) {
+      return data.keys().hasAll(['userId', 'query', 'title', 'resultSummary', 'createdAt'])
+        && data.keys().hasOnly(['userId', 'query', 'title', 'resultSummary', 'createdAt'])
+        && data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128
+        && data.query is string && data.query.size() > 0 && data.query.size() <= 150
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 150
+        && data.resultSummary is string && data.resultSummary.size() <= 500
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    // Users collection: Private user documents
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false; // Blanket user listing forbidden
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming())
+        && incoming().userId == existing().userId
+        && incoming().createdAt == existing().createdAt;
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+
+    // Searches collection: Capped personal search history
+    match /searches/{searchId} {
+      allow get: if isSignedIn() && isValidId(searchId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(searchId) && isValidSearchRecord(incoming());
+      allow update: if false; // Search records are immutable snapshots
+      allow delete: if isSignedIn() && isValidId(searchId) && existing().userId == request.auth.uid;
+    }
+  }
+}
