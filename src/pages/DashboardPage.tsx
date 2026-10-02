@@ -5,6 +5,7 @@ import { SearchBar } from '../components/SearchBar';
 import { RecentSearches } from '../components/RecentSearches';
 import { ProtocolCard } from '../components/ProtocolCard';
 import { Disclaimer } from '../components/Disclaimer';
+import { AppImages } from '../assets/images';
 import { Sparkles, BookOpen, Compass, ArrowRight } from 'lucide-react';
 import { premiumEase, fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
@@ -46,7 +47,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Background Artwork - Solitary figure walking towards radiant sun portal */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="/src/assets/images/lumina_inicio_banner_1790530584550.jpg"
+            src={AppImages.inicioBanner}
             alt="Silueta contemplativa hacia el horizonte luminoso de BioPNL"
             className="w-full h-full object-cover object-[78%_center] sm:object-[72%_35%] scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
           />
@@ -109,7 +110,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* Framed Artwork Column with glowing pastel aura */}
           <div className="relative w-full md:w-64 h-56 md:h-72 rounded-[24px] sm:rounded-[28px] overflow-hidden shrink-0 shadow-md group border border-white/80 dark:border-white/10">
             <img
-              src="/src/assets/images/lumina_inicio_portrait_1790530594161.jpg"
+              src={AppImages.inicioPortrait}
               alt="Hacia el sol interior - Práctica de calma BioPNL"
               className="w-full h-full object-cover object-[center_40%] group-hover:scale-105 transition-transform duration-700 ease-out"
             />
@@ -192,7 +193,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* Subtle abstract wave asset */}
           <div className="absolute right-0 top-0 w-1/2 h-full opacity-15 pointer-events-none overflow-hidden">
             <img
-              src="/src/assets/images/lumina_organic_waves_1790527326570.jpg"
+              src={AppImages.organicWaves}
               alt="Ondas orgánicas"
               className="w-full h-full object-cover"
             />

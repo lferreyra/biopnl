@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Protocol, ProtocolCategory } from '../types';
 import { ProtocolService } from '../services/protocolService';
 import { ProtocolCard } from '../components/ProtocolCard';
+import { AppImages } from '../assets/images';
 import { Sparkles, Filter } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
@@ -41,7 +42,7 @@ export const ProtocolsPage: React.FC<ProtocolsPageProps> = ({
         {/* Background Image - Motion blur meditation artwork */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="/src/assets/images/lumina_inner_presence_banner_1790534408170.jpg"
+            src={AppImages.innerPresenceBanner}
             alt="Presencia interior y meditación BioPNL"
             className="w-full h-full object-cover object-[center_35%] scale-100 group-hover:scale-103 transition-transform duration-1000 ease-out"
           />

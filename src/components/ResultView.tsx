@@ -18,6 +18,7 @@ import {
   Check
 } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
+import { AppImages } from '../assets/images';
 
 interface ResultViewProps {
   result: KnowledgeResult;
@@ -251,7 +252,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <div className="flex items-center gap-4 p-4 rounded-[22px] bio-glass-card overflow-hidden shadow-2xs">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[18px] overflow-hidden shrink-0 shadow-xs border border-white/80 dark:border-white/10">
               <img
-                src="/src/assets/images/lumina_inner_presence_card_1790534397513.jpg"
+                src={AppImages.innerPresenceCard}
                 alt="Introspección y escucha interior"
                 className="w-full h-full object-cover object-[center_25%]"
               />

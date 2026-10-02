@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Sparkles, Wind, Brain, Compass, Search, Home, BookOpen, Heart, Volume2 } from 'lucide-react';
+import { AppImages } from '../../assets/images';
 
 interface MockupDevicesShowcaseProps {
   activeSlide?: number;
@@ -94,7 +95,7 @@ export const MockupDevicesShowcase: React.FC<MockupDevicesShowcaseProps> = ({
             {/* Card Preview with Seated Meditator */}
             <div className="relative my-1.5 rounded-2xl overflow-hidden flex-1 max-h-[120px] bg-white/40 border border-white/60 p-2 flex flex-col justify-between shadow-2xs">
               <img
-                src="/src/assets/images/lumina_inner_presence_card_1790534397513.jpg"
+                src={AppImages.innerPresenceCard}
                 alt="Introspección y escucha interior"
                 className="absolute inset-0 w-full h-full object-cover object-center opacity-85"
               />
@@ -178,7 +179,7 @@ export const MockupDevicesShowcase: React.FC<MockupDevicesShowcaseProps> = ({
             {/* Meditator Artwork Frame */}
             <div className="relative my-1.5 rounded-2xl overflow-hidden flex-1 max-h-[115px] bg-black/40 border border-white/10 p-2 flex flex-col justify-between">
               <img
-                src="/src/assets/images/lumina_inner_presence_banner_1790534408170.jpg"
+                src={AppImages.innerPresenceBanner}
                 alt="Consciencia somática"
                 className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
               />
@@ -240,7 +241,7 @@ export const MockupDevicesShowcase: React.FC<MockupDevicesShowcaseProps> = ({
           <div className="w-full h-full rounded-[28px] sm:rounded-[32px] bg-gradient-to-b from-[#7A2B15] via-[#C95832] to-[#3B1207] text-white p-2.5 sm:p-3 flex flex-col justify-between overflow-hidden relative shadow-inner pt-4">
             {/* Background image of solitary figure walking towards radiant sun portal */}
             <img
-              src="/src/assets/images/lumina_inicio_portrait_1790530594161.jpg"
+              src={AppImages.inicioPortrait}
               alt="Hacia el sol interior BioPNL"
               className="absolute inset-0 w-full h-full object-cover object-[center_35%] opacity-90"
             />
@@ -268,7 +269,7 @@ export const MockupDevicesShowcase: React.FC<MockupDevicesShowcaseProps> = ({
               </div>
 
               <h3 className="font-heading text-xs sm:text-sm font-bold tracking-tight text-white leading-tight">
-                Hola, Amelia!
+                ¡Hola, Lucas!
               </h3>
             </div>
 

@@ -1,4 +1,5 @@
 import { UserProfile } from '../types';
+import { AdminService } from './adminService';
 
 const AUTH_STORAGE_KEY = 'lumina_active_user';
 
@@ -11,6 +12,10 @@ export class AuthService {
       const stored = localStorage.getItem(AUTH_STORAGE_KEY);
       if (stored) {
         this.currentUser = JSON.parse(stored);
+        if (this.currentUser) {
+          // Sync with AdminService
+          this.currentUser = AdminService.registerOrUpdateUser(this.currentUser);
+        }
       } else {
         this.currentUser = null;
       }
@@ -40,15 +45,21 @@ export class AuthService {
   }
 
   static async signIn(email: string, _password?: string): Promise<UserProfile> {
-    const name = email.split('@')[0] || 'Explorador';
-    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
-    const user: UserProfile = {
-      id: `user_${Date.now()}`,
-      userId: `user_${Date.now()}`,
+    const cleanEmail = email.trim().toLowerCase();
+    const isLucas = cleanEmail === 'lucas.ferreyra@gmail.com';
+    const name = isLucas ? 'Lucas Ferreyra' : (email.split('@')[0] || 'Explorador');
+    const formattedName = isLucas ? name : (name.charAt(0).toUpperCase() + name.slice(1));
+
+    const rawUser: UserProfile = {
+      id: isLucas ? 'user_lucas_admin' : `user_${Date.now()}`,
+      userId: isLucas ? 'user_lucas_admin' : `user_${Date.now()}`,
       name: formattedName,
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
+      role: isLucas ? 'admin' : (AdminService.isUserAdmin(cleanEmail) ? 'admin' : 'user'),
       createdAt: new Date().toISOString()
     };
+
+    const user = AdminService.registerOrUpdateUser(rawUser);
     this.currentUser = user;
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     this.notify();
@@ -60,13 +71,19 @@ export class AuthService {
   }
 
   static async signUp(name: string, email: string, _password?: string): Promise<UserProfile> {
-    const user: UserProfile = {
-      id: `user_${Date.now()}`,
-      userId: `user_${Date.now()}`,
+    const cleanEmail = email.trim().toLowerCase();
+    const isLucas = cleanEmail === 'lucas.ferreyra@gmail.com';
+
+    const rawUser: UserProfile = {
+      id: isLucas ? 'user_lucas_admin' : `user_${Date.now()}`,
+      userId: isLucas ? 'user_lucas_admin' : `user_${Date.now()}`,
       name: name.trim() || 'Explorador',
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
+      role: isLucas ? 'admin' : 'user',
       createdAt: new Date().toISOString()
     };
+
+    const user = AdminService.registerOrUpdateUser(rawUser);
     this.currentUser = user;
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     this.notify();
@@ -78,32 +95,24 @@ export class AuthService {
   }
 
   static async signInWithGoogle(): Promise<UserProfile> {
-    // Elegant Google authentication flow
-    const user: UserProfile = {
-      id: 'google_user_lucas',
-      userId: 'google_user_lucas',
+    const rawUser: UserProfile = {
+      id: 'user_lucas_admin',
+      userId: 'user_lucas_admin',
       name: 'Lucas Ferreyra',
       email: 'lucas.ferreyra@gmail.com',
+      role: 'admin',
       createdAt: new Date().toISOString()
     };
+
+    const user = AdminService.registerOrUpdateUser(rawUser);
     this.currentUser = user;
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     this.notify();
     return user;
   }
 
-  static async signInAsDemoUser(): Promise<UserProfile> {
-    const user: UserProfile = {
-      id: 'user_amelia_demo',
-      userId: 'user_amelia_demo',
-      name: 'Amelia',
-      email: 'amelia.bienestar@biopnl.app',
-      createdAt: new Date().toISOString()
-    };
-    this.currentUser = user;
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    this.notify();
-    return user;
+  static async signInAsAdmin(): Promise<UserProfile> {
+    return this.signInWithGoogle();
   }
 
   static async signOut(): Promise<void> {

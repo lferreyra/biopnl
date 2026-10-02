@@ -67,12 +67,19 @@ export interface SearchRecord {
   createdAt: string; // ISO string
 }
 
+export type UserRole = 'admin' | 'user';
+
 export interface UserProfile {
   id: string;
   userId: string;
   name: string;
   email: string;
   createdAt: string;
+  role?: UserRole;
+  lastActiveAt?: string;
+  searchesCount?: number;
+  protocolsCount?: number;
+  status?: 'active' | 'inactive';
 }
 
 export type ThemeMode = 'light' | 'dark';

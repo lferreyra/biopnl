@@ -16,6 +16,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SearchPage } from './pages/SearchPage';
 import { ProtocolsPage } from './pages/ProtocolsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { AdminService } from './services/adminService';
 import { ResultView } from './components/ResultView';
 import { ProtocolDetailModal } from './components/ProtocolDetailModal';
 import { LoadingState } from './components/LoadingState';
@@ -72,6 +74,7 @@ export default function App() {
       if (user) {
         SearchService.saveSearch(user.userId, result.query, result.title, result.summary);
         setSearches(SearchService.getRecentSearches(user.userId));
+        AdminService.recordSearch(user.email, result.query);
       }
     } catch (err) {
       console.error('Search error:', err);
@@ -105,6 +108,14 @@ export default function App() {
     // If switching tabs, clear active single result view
     if (activeResult) {
       setActiveResult(null);
+    }
+  };
+
+  // Protocol selection handler
+  const handleOpenProtocol = (protocol: Protocol) => {
+    setActiveProtocol(protocol);
+    if (user) {
+      AdminService.recordProtocol(user.email, protocol.title);
     }
   };
 
@@ -147,7 +158,7 @@ export default function App() {
         <ResultView
           result={activeResult}
           onBack={() => setActiveResult(null)}
-          onOpenProtocol={(p) => setActiveProtocol(p)}
+          onOpenProtocol={handleOpenProtocol}
           onNewSearch={() => {
             setActiveResult(null);
             setCurrentTab('search');
@@ -163,7 +174,7 @@ export default function App() {
               onSelectSearch={handleSelectRecentSearch}
               onDeleteSearch={handleDeleteSearch}
               onNavigateToProtocols={() => setCurrentTab('protocols')}
-              onOpenProtocol={(p) => setActiveProtocol(p)}
+              onOpenProtocol={handleOpenProtocol}
               featuredProtocols={featuredProtocols}
               isSearching={isSearching}
             />
@@ -178,7 +189,7 @@ export default function App() {
 
           {currentTab === 'protocols' && (
             <ProtocolsPage
-              onOpenProtocol={(p) => setActiveProtocol(p)}
+              onOpenProtocol={handleOpenProtocol}
             />
           )}
 
@@ -187,7 +198,12 @@ export default function App() {
               user={user}
               onSignOut={handleSignOut}
               searchesCount={searches.length}
+              onNavigateToAdmin={() => setCurrentTab('admin')}
             />
+          )}
+
+          {currentTab === 'admin' && (
+            <AdminDashboardPage currentUser={user} />
           )}
         </>
       )}

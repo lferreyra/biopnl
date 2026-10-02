@@ -4,6 +4,7 @@ import { Protocol } from '../types';
 import { renderProtocolIcon } from './ProtocolCard';
 import { X, Clock, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, Play, Pause, RotateCcw } from 'lucide-react';
 import { premiumEase } from '../utils/motionPresets';
+import { AppImages } from '../assets/images';
 
 interface ProtocolDetailModalProps {
   protocol: Protocol | null;
@@ -71,7 +72,7 @@ export const ProtocolDetailModal: React.FC<ProtocolDetailModalProps> = ({
           {/* Subtle contemplative artwork overlay */}
           <div className="absolute right-0 top-0 w-64 h-full opacity-20 dark:opacity-25 pointer-events-none overflow-hidden mix-blend-multiply dark:mix-blend-screen">
             <img
-              src="/src/assets/images/lumina_inner_presence_card_1790534397513.jpg"
+              src={AppImages.innerPresenceCard}
               alt="Atmósfera de introspección"
               className="w-full h-full object-cover object-[center_30%]"
             />

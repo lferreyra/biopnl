@@ -5,7 +5,7 @@ import { AuthService } from '../services/authService';
 import { Logo } from '../components/Logo';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { Disclaimer } from '../components/Disclaimer';
-import { Lock, Mail, User, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Lock, Mail, User, ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
 interface LoginPageProps {
@@ -53,19 +53,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       onLoginSuccess(user);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al conectar con Google.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDemoSignIn = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const user = await AuthService.signInAsDemoUser();
-      onLoginSuccess(user);
-    } catch {
-      setError('No se pudo acceder con la cuenta de demostración.');
     } finally {
       setIsLoading(false);
     }
@@ -144,13 +131,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </p>
             </div>
 
-            <button
-              onClick={handleDemoSignIn}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-bold border border-white/25 transition-all cursor-pointer shadow-xs"
-            >
-              <span>Explorar</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#E8B8A6]" />
-            </button>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 text-white text-xs font-semibold border border-white/25 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-[#E8B8A6]" />
+              <span>Acceso seguro</span>
+            </div>
           </div>
         </motion.div>
 
@@ -315,14 +299,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </form>
 
             {/* Quick Demo Access */}
-            <div className="mt-6 pt-4 border-t border-[#E8B8A6]/30 dark:border-white/10 text-center">
-              <button
-                type="button"
-                onClick={handleDemoSignIn}
-                className="text-xs text-[#8F3722] dark:text-[#E07853] hover:underline font-bold cursor-pointer"
-              >
-                Click aquí para probar como demo (Amelia) →
-              </button>
+            <div className="mt-6 pt-4 border-t border-[#E8B8A6]/30 dark:border-white/10 text-center text-[11px] text-[#374151] dark:text-[#BDB0A8]">
+              <span>Plataforma 100% gratuita y privada.</span>
             </div>
           </div>
 

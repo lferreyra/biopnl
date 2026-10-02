@@ -119,14 +119,14 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
     }
   };
 
-  const handleDemoSignIn = async () => {
+  const handleAdminSignIn = async () => {
     setIsLoading(true);
     setAuthError(null);
     try {
-      const user = await AuthService.signInAsDemoUser();
+      const user = await AuthService.signInAsAdmin();
       onLoginSuccess(user);
     } catch {
-      setAuthError('No se pudo acceder con la cuenta de demostración.');
+      setAuthError('No se pudo acceder como administrador.');
     } finally {
       setIsLoading(false);
     }
@@ -578,7 +578,7 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                         <span>Formas de acceso:</span>
                       </div>
                       <p className="text-[#374151] dark:text-[#BDB0A8]">
-                        Con Google en 1 clic, con email y contraseña, o como usuario demo de prueba (Amelia).
+                        Con Google en 1 clic o con tu correo electrónico y contraseña.
                       </p>
                     </div>
 
@@ -639,18 +639,21 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                     </div>
                   </div>
 
-                  {/* 1-Click Demo Button */}
+                  {/* Production Admin Access Card */}
                   <div className="bio-dark-card rounded-xl p-3 flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-bold text-white">¿Querés probarla de inmediato?</h4>
-                      <p className="text-[10px] text-white/70">Ingresá con 1 clic con el usuario de prueba.</p>
+                      <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#E07853]" />
+                        <span>Acceso de Administrador</span>
+                      </h4>
+                      <p className="text-[10px] text-white/70">Lucas Ferreyra (lucas.ferreyra@gmail.com)</p>
                     </div>
                     <button
-                      onClick={handleDemoSignIn}
+                      onClick={handleAdminSignIn}
                       disabled={isLoading}
-                      className="px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition-all cursor-pointer shrink-0"
+                      className="px-3 py-1 rounded-full bg-[#8F3722] hover:bg-[#A94A32] text-white text-xs font-bold transition-all cursor-pointer shrink-0"
                     >
-                      Entrar como Amelia →
+                      Entrar como Admin →
                     </button>
                   </div>
                 </div>
@@ -773,14 +776,15 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                       </div>
                     </form>
 
-                    {/* Instant Demo Button */}
-                    <div className="mt-2.5 pt-2 border-t border-[#E8B8A6]/30 dark:border-white/10 text-center">
+                    {/* Admin Access Shortcut */}
+                    <div className="mt-2 pt-2 border-t border-[#E8B8A6]/30 dark:border-white/10 flex items-center justify-center text-[11px] font-bold">
                       <button
                         type="button"
-                        onClick={handleDemoSignIn}
-                        className="text-[11px] text-[#8F3722] dark:text-[#E07853] hover:underline font-bold cursor-pointer"
+                        onClick={handleAdminSignIn}
+                        className="text-[#8F3722] dark:text-[#E07853] hover:underline flex items-center gap-1.5 cursor-pointer"
                       >
-                        O probá con 1 clic como demo (Amelia) →
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>Acceso de Administrador (Lucas Ferreyra)</span>
                       </button>
                     </div>
                   </div>

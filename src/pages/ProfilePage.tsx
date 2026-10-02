@@ -4,21 +4,24 @@ import { UserProfile } from '../types';
 import { UserAvatar } from '../components/UserAvatar';
 import { Disclaimer } from '../components/Disclaimer';
 import { useTheme } from '../context/ThemeContext';
-import { LogOut, Calendar, Mail, Database, BookOpen, ExternalLink, Moon, Sun } from 'lucide-react';
+import { LogOut, Calendar, Mail, Database, BookOpen, ExternalLink, Moon, Sun, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
 interface ProfilePageProps {
   user: UserProfile;
   onSignOut: () => void;
   searchesCount: number;
+  onNavigateToAdmin?: () => void;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   user,
   onSignOut,
-  searchesCount
+  searchesCount,
+  onNavigateToAdmin
 }) => {
   const { theme, setTheme } = useTheme();
+  const isAdmin = user.role === 'admin' || user.email.toLowerCase() === 'lucas.ferreyra@gmail.com';
 
   const memberSince = new Date(user.createdAt).toLocaleDateString('es-ES', {
     month: 'long',
@@ -30,7 +33,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
       variants={staggerContainerVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-2xl mx-auto space-y-8 py-4"
+      className="max-w-2xl mx-auto space-y-6 py-4"
     >
       {/* Header */}
       <motion.div variants={fadeInUpVariants} className="space-y-1">
@@ -38,7 +41,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           Tu Perfil
         </h1>
         <p className="text-xs sm:text-sm text-[#374151] dark:text-[#BDB0A8] font-medium">
-          Información de tu cuenta, privacidad y apariencia en BioPNL.
+          Información de tu cuenta, rol, privacidad y apariencia en BioPNL.
         </p>
       </motion.div>
 
@@ -47,18 +50,55 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         variants={fadeInUpVariants}
         className="bio-glass-panel rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 space-y-6"
       >
-        <div className="flex items-center gap-4">
-          <UserAvatar name={user.name} size="lg" />
-          <div className="min-w-0">
-            <h2 className="font-heading text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] truncate">
-              {user.name}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#374151] dark:text-[#BDB0A8] font-semibold flex items-center gap-1.5 mt-0.5">
-              <Mail className="w-3.5 h-3.5 text-[#8F3722] dark:text-[#E07853]" />
-              <span className="truncate">{user.email}</span>
-            </p>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <UserAvatar name={user.name} size="lg" />
+            <div className="min-w-0">
+              <h2 className="font-heading text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] truncate">
+                {user.name}
+              </h2>
+              <p className="text-xs sm:text-sm text-[#374151] dark:text-[#BDB0A8] font-semibold flex items-center gap-1.5 mt-0.5">
+                <Mail className="w-3.5 h-3.5 text-[#8F3722] dark:text-[#E07853]" />
+                <span className="truncate">{user.email}</span>
+              </p>
+            </div>
           </div>
+
+          {/* Role Badge */}
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+              isAdmin
+                ? 'bg-[#8F3722]/15 text-[#8F3722] dark:text-[#E07853] border border-[#8F3722]/30'
+                : 'bg-black/5 dark:bg-white/10 text-[#374151] dark:text-[#BDB0A8]'
+            }`}
+          >
+            {isAdmin ? <ShieldCheck className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+            <span>{isAdmin ? 'Administrador' : 'Usuario'}</span>
+          </span>
         </div>
+
+        {/* Admin Shortcut Banner */}
+        {isAdmin && onNavigateToAdmin && (
+          <div className="p-4 rounded-2xl bg-[#8F3722]/10 dark:bg-[#E07853]/15 border border-[#8F3722]/20 flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <h4 className="text-xs font-bold text-[#111111] dark:text-white flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#8F3722] dark:text-[#E07853]" />
+                <span>Privilegios de Administrador Activos</span>
+              </h4>
+              <p className="text-[11px] text-[#374151] dark:text-[#BDB0A8]">
+                Podés ver métricas de usuarios, correos registrados y consultas del sistema.
+              </p>
+            </div>
+
+            <button
+              onClick={onNavigateToAdmin}
+              className="px-4 py-2 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] text-xs font-bold flex items-center gap-1.5 shrink-0 shadow-xs hover:opacity-90 transition-all cursor-pointer"
+            >
+              <span>Abrir Panel Admin</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Theme Preference Selector */}
         <div className="pt-2 border-t border-[#E8B8A6]/30 dark:border-[#E8B8A6]/10">

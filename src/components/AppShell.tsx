@@ -10,10 +10,11 @@ import {
   User,
   LogOut,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck
 } from 'lucide-react';
 
-export type NavTab = 'dashboard' | 'search' | 'protocols' | 'profile';
+export type NavTab = 'dashboard' | 'search' | 'protocols' | 'profile' | 'admin';
 
 interface AppShellProps {
   currentTab: NavTab;
@@ -30,6 +31,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   onSignOut,
   children
 }) => {
+  const isAdmin = user?.role === 'admin' || user?.email?.toLowerCase() === 'lucas.ferreyra@gmail.com';
+
   const navItems: { id: NavTab; label: string; icon: React.ReactNode }[] = [
     {
       id: 'dashboard',
@@ -50,7 +53,16 @@ export const AppShell: React.FC<AppShellProps> = ({
       id: 'profile',
       label: 'Perfil',
       icon: <User className="w-5 h-5" />
-    }
+    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'admin' as NavTab,
+            label: 'Admin',
+            icon: <ShieldCheck className="w-5 h-5" />
+          }
+        ]
+      : [])
   ];
 
   return (
@@ -192,7 +204,7 @@ export const AppShell: React.FC<AppShellProps> = ({
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9F5]/95 dark:bg-[#18100C]/95 backdrop-blur-2xl border-t border-[#E8B8A6]/40 dark:border-white/10 px-3 py-2"
         aria-label="Navegación móvil"
       >
-        <div className="grid grid-cols-4 items-center max-w-md mx-auto h-14">
+        <div className={`grid ${navItems.length === 5 ? 'grid-cols-5' : 'grid-cols-4'} items-center max-w-md mx-auto h-14`}>
           {navItems.map((item) => {
             const isActive = currentTab === item.id;
             return (
