@@ -1,12 +1,12 @@
 {
-  "projectId": "reven-b55d5",
-  "appId": "1:316361254730:web:1966af40ae86d3f51143b3",
-  "apiKey": "AIzaSyCyBVOYBKhfF_7sY8NXr2FLTD--_aMO83M",
-  "authDomain": "reven-b55d5.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-biopnl-26ae8017-35ce-485b-8c79-536030bf22e8",
-  "storageBucket": "reven-b55d5.firebasestorage.app",
-  "messagingSenderId": "316361254730",
-  "measurementId": "",
-  "oAuthClientId": "316361254730-c6d8o295idcpfr1luuakngd0ghl7qivs.apps.googleusercontent.com",
+  "projectId": "biopnl",
+  "appId": "1:254988848662:web:1282e36247bac717442f37",
+  "apiKey": "AIzaSyCOjQVfk0VQLYePjBnvx06sNpXLkmQfaoY",
+  "authDomain": "biopnl.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "biopnl.firebasestorage.app",
+  "messagingSenderId": "254988848662",
+  "measurementId": "G-MT3KS8SKXL",
+  "oAuthClientId": "",
   "recaptchaSiteKey": ""
 }

@@ -449,8 +449,40 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                       {isSignUp ? "Crear cuenta gratis" : "Iniciar sesión"}
                     </h3>
                     <p className="text-xs text-[#3D3532] dark:text-white/70 mt-0.5">
-                      {isSignUp ? "Empezá en segundos" : "Bienvenido de vuelta a tu espacio"}
+                      {isSignUp ? "Registrate con tu nombre y correo" : "Bienvenido de vuelta a tu espacio"}
                     </p>
+                  </div>
+
+                  {/* Tabs: Iniciar sesión / Crear cuenta */}
+                  <div className="grid grid-cols-2 p-1 rounded-xl bg-black/5 dark:bg-white/10 mb-3 border border-black/5 dark:border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignUp(false);
+                        setAuthError(null);
+                      }}
+                      className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        !isSignUp
+                          ? 'bg-white dark:bg-[#2A201C] text-[#1A1412] dark:text-white shadow-xs'
+                          : 'text-[#3D3532]/70 dark:text-white/60 hover:text-[#1A1412] dark:hover:text-white'
+                      }`}
+                    >
+                      Iniciar sesión
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignUp(true);
+                        setAuthError(null);
+                      }}
+                      className={`py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        isSignUp
+                          ? 'bg-white dark:bg-[#2A201C] text-[#1A1412] dark:text-white shadow-xs'
+                          : 'text-[#3D3532]/70 dark:text-white/60 hover:text-[#1A1412] dark:hover:text-white'
+                      }`}
+                    >
+                      Crear cuenta
+                    </button>
                   </div>
 
                   <button

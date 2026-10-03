@@ -137,6 +137,10 @@ export class AuthService {
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
         return 'Correo o contraseña incorrectos. Verificá tus datos.';
+      case 'auth/unauthorized-domain': {
+        const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+        return `Dominio no autorizado en Firebase. Tu dominio actual es: "${currentHost}". Cópialo sin "https://" y pégalo en Firebase Console > Authentication > Settings > Dominios autorizados. O bien, puedes registrarte abajo con tu correo y contraseña.`;
+      }
       case 'auth/popup-closed-by-user':
         return 'La ventana de inicio con Google se cerró antes de completar el acceso.';
       case 'auth/network-request-failed':
