@@ -14,21 +14,18 @@ import {
   Lock,
   Mail,
   User,
-  ShieldCheck,
   Compass,
   Wind
 } from "lucide-react";
 
 interface LandingCarouselPageProps {
   onLoginSuccess: (user: UserProfile) => void;
-  currentUserEmail?: string;
 }
 
 const TOTAL_SLIDES = 5;
 
 export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
-  onLoginSuccess,
-  currentUserEmail = "lucas.ferreyra@gmail.com"
+  onLoginSuccess
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -85,21 +82,8 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
     try {
       const user = await AuthService.signInWithGoogle();
       onLoginSuccess(user);
-    } catch {
-      setAuthError("No se pudo iniciar sesión con Google.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAdminSignIn = async () => {
-    setIsLoading(true);
-    setAuthError(null);
-    try {
-      const user = await AuthService.signInAsAdmin();
-      onLoginSuccess(user);
-    } catch {
-      setAuthError("No se pudo acceder como administrador.");
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : "No se pudo iniciar sesión con Google.");
     } finally {
       setIsLoading(false);
     }
@@ -575,17 +559,6 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                       </button>
                     </div>
                   </form>
-
-                  <div className="mt-2 pt-1.5 border-t border-black/10 dark:border-white/15 flex items-center justify-center text-xs font-semibold">
-                    <button
-                      type="button"
-                      onClick={handleAdminSignIn}
-                      className="text-[#3D3532] dark:text-white/80 hover:text-[#8F3722] dark:hover:text-white flex items-center gap-1.5 cursor-pointer text-[11px]"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5 text-[#8F3722] dark:text-[#F47A45]" />
-                      <span>Acceso Administrador (Lucas)</span>
-                    </button>
-                  </div>
                 </div>
               </div>
             </motion.div>

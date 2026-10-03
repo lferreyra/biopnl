@@ -18,35 +18,7 @@ export class SearchService {
           .slice(0, 5);
       }
       
-      // Seed with initial realistic demo history if brand new user
-      const initialSeed: SearchRecord[] = [
-        {
-          id: 'search_seed_1',
-          userId,
-          query: 'Ansiedad',
-          title: 'Ansiedad e Inquietud Anticipatoria',
-          resultSummary: 'Compilación de reflexiones en torno a la activación del sistema de alerta.',
-          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // Hace 2 horas
-        },
-        {
-          id: 'search_seed_2',
-          userId,
-          query: 'Migraña',
-          title: 'Migraña y Cefaleas Tensionales',
-          resultSummary: 'Enfoques no directivos sobre la cefalea tensional y procesos de control.',
-          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // Ayer
-        },
-        {
-          id: 'search_seed_3',
-          userId,
-          query: 'Dolor lumbar',
-          title: 'Dolor Lumbar y Sobrecarga Baja de la Columna',
-          resultSummary: 'Simbólica de la estructura ósea, soporte material y redistribución de cargas.',
-          createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString() // Hace 3 días
-        }
-      ];
-      localStorage.setItem(key, JSON.stringify(initialSeed));
-      return initialSeed;
+      return [];
     } catch {
       return [];
     }

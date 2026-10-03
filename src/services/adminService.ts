@@ -1,4 +1,6 @@
 import { UserProfile, UserRole } from '../types';
+import { db, auth } from '../firebase/firebase';
+import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export interface AdminActivityItem {
   id: string;
@@ -158,6 +160,29 @@ export class AdminService {
     return [...this.users];
   }
 
+  static async syncUsersFromFirestore(): Promise<UserProfile[]> {
+    this.init();
+    if (db && auth?.currentUser) {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const firestoreUsers: UserProfile[] = [];
+        snap.forEach((docSnap) => {
+          const data = docSnap.data() as UserProfile;
+          if (data && data.email && !DEMO_EMAILS.has(data.email.toLowerCase())) {
+            firestoreUsers.push(data);
+          }
+        });
+        if (firestoreUsers.length > 0) {
+          this.users = firestoreUsers;
+          this.saveUsers();
+        }
+      } catch (e) {
+        console.warn('Could not sync users from Firestore:', e);
+      }
+    }
+    return this.getAllUsers();
+  }
+
   static isUserAdmin(email?: string): boolean {
     if (!email) return false;
     const cleanEmail = email.trim().toLowerCase();
@@ -208,7 +233,7 @@ export class AdminService {
     return updatedUser;
   }
 
-  static updateUserRole(userId: string, newRole: UserRole): boolean {
+  static async updateUserRole(userId: string, newRole: UserRole): Promise<boolean> {
     this.init();
     const user = this.users.find((u) => u.id === userId || u.userId === userId);
     if (!user) return false;
@@ -220,10 +245,18 @@ export class AdminService {
 
     user.role = newRole;
     this.saveUsers();
+
+    if (db) {
+      try {
+        await updateDoc(doc(db, 'users', userId), { role: newRole });
+      } catch (err) {
+        console.warn('Firestore update role error:', err);
+      }
+    }
     return true;
   }
 
-  static deleteUser(userId: string): boolean {
+  static async deleteUser(userId: string): Promise<boolean> {
     this.init();
     const target = this.users.find((u) => u.id === userId || u.userId === userId);
     if (target?.email.toLowerCase() === 'lucas.ferreyra@gmail.com') {
@@ -231,6 +264,14 @@ export class AdminService {
     }
     this.users = this.users.filter((u) => u.id !== userId && u.userId !== userId);
     this.saveUsers();
+
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'users', userId));
+      } catch (err) {
+        console.warn('Firestore delete user error:', err);
+      }
+    }
     return true;
   }
 

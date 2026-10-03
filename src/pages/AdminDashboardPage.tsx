@@ -35,30 +35,38 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ currentU
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user'>('all');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const refreshData = () => {
+  useEffect(() => {
+    AdminService.syncUsersFromFirestore().then((synced) => {
+      setUsers(synced);
+      setAnalytics(AdminService.getAnalyticsSummary());
+    });
+  }, []);
+
+  const refreshData = async () => {
+    const synced = await AdminService.syncUsersFromFirestore();
+    setUsers(synced);
     setAnalytics(AdminService.getAnalyticsSummary());
-    setUsers(AdminService.getAllUsers());
   };
 
-  const handleRoleToggle = (userId: string, currentRole?: UserRole) => {
+  const handleRoleToggle = async (userId: string, currentRole?: UserRole) => {
     const newRole: UserRole = currentRole === 'admin' ? 'user' : 'admin';
-    const success = AdminService.updateUserRole(userId, newRole);
+    const success = await AdminService.updateUserRole(userId, newRole);
     if (success) {
-      refreshData();
+      await refreshData();
       showTemporaryStatus(`Rol actualizado correctamente a "${newRole}".`);
     } else {
       showTemporaryStatus('No es posible modificar el rol del Administrador Principal.');
     }
   };
 
-  const handleDeleteUser = (userId: string, email: string) => {
+  const handleDeleteUser = async (userId: string, email: string) => {
     if (email.toLowerCase() === 'lucas.ferreyra@gmail.com') {
       showTemporaryStatus('No podés eliminar la cuenta del Administrador Principal.');
       return;
     }
     if (window.confirm(`¿Estás seguro de que querés eliminar el usuario "${email}"?`)) {
-      AdminService.deleteUser(userId);
-      refreshData();
+      await AdminService.deleteUser(userId);
+      await refreshData();
       showTemporaryStatus('Usuario eliminado del registro.');
     }
   };

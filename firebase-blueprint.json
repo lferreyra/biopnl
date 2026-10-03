@@ -1,76 +1,176 @@
 {
   "entities": {
-    "UserProfile": {
-      "title": "UserProfile",
-      "description": "User account profile document storing non-sensitive user metadata.",
+    "User": {
+      "title": "User",
+      "description": "Registered user profile with role and usage counters",
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique user identifier matching auth UID"
+        },
         "userId": {
           "type": "string",
-          "description": "Unique user identifier matching auth.uid",
-          "maxLength": 128
+          "description": "Unique user identifier matching auth UID"
         },
         "name": {
           "type": "string",
-          "description": "User display name",
-          "maxLength": 100
+          "description": "Display name of the user"
         },
         "email": {
           "type": "string",
-          "description": "User email address",
           "format": "email",
-          "maxLength": 150
+          "description": "User email address"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user"],
+          "description": "Role determining access privileges"
         },
         "createdAt": {
           "type": "string",
-          "description": "ISO timestamp of account creation",
-          "maxLength": 64
+          "format": "date-time",
+          "description": "Account creation timestamp"
+        },
+        "lastActiveAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last activity timestamp"
+        },
+        "searchesCount": {
+          "type": "number",
+          "description": "Number of symptom searches performed"
+        },
+        "protocolsCount": {
+          "type": "number",
+          "description": "Number of protocols run"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "inactive"],
+          "description": "Account status"
         }
       },
-      "required": ["userId", "name", "email", "createdAt"]
+      "required": ["id", "userId", "name", "email", "role", "createdAt"]
     },
-    "SearchRecord": {
-      "title": "SearchRecord",
-      "description": "A search record logged by an authenticated user, capped at maximum 5 most recent records per user.",
+    "UserReflection": {
+      "title": "UserReflection",
+      "description": "Daily reflection or personal note saved by the user",
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique reflection identifier"
+        },
         "userId": {
           "type": "string",
-          "description": "Author UID",
-          "maxLength": 128
+          "description": "Owner user UID"
         },
-        "query": {
+        "date": {
           "type": "string",
-          "description": "Search term entered by user",
-          "maxLength": 150
+          "description": "Date of reflection (YYYY-MM-DD)"
+        },
+        "content": {
+          "type": "string",
+          "description": "Reflection text note"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["id", "userId", "content", "updatedAt"]
+    },
+    "UserFavorite": {
+      "title": "UserFavorite",
+      "description": "Saved favorite symptom card or protocol",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique favorite ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        },
+        "itemType": {
+          "type": "string",
+          "enum": ["symptom", "protocol"],
+          "description": "Type of item favorited"
+        },
+        "itemId": {
+          "type": "string",
+          "description": "Referenced item identifier"
         },
         "title": {
           "type": "string",
-          "description": "Resolved condition or concept title",
-          "maxLength": 150
+          "description": "Item title"
         },
-        "resultSummary": {
+        "savedAt": {
           "type": "string",
-          "description": "Brief summary of the knowledge provider response",
-          "maxLength": 500
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Creation timestamp",
-          "maxLength": 64
+          "format": "date-time",
+          "description": "Timestamp when favorited"
         }
       },
-      "required": ["userId", "query", "title", "createdAt", "resultSummary"]
+      "required": ["id", "userId", "itemType", "itemId", "title", "savedAt"]
+    },
+    "UserActivity": {
+      "title": "UserActivity",
+      "description": "Activity log entry for searches and protocol runs",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique activity log entry ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User UID who performed the action"
+        },
+        "userName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["search", "protocol", "login", "signup"],
+          "description": "Action type"
+        },
+        "detail": {
+          "type": "string",
+          "description": "Action details or search query"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of action"
+        }
+      },
+      "required": ["id", "userId", "action", "detail", "timestamp"]
     }
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": "UserProfile",
-      "description": "User private profile documents"
+      "schema": "User",
+      "description": "User profile with role, email, and activity counters"
     },
-    "/searches/{searchId}": {
-      "schema": "SearchRecord",
-      "description": "User recent searches history capped at 5 items per user"
+    "/users/{userId}/reflections/{reflectionId}": {
+      "schema": "UserReflection",
+      "description": "Personal daily reflections"
+    },
+    "/users/{userId}/favorites/{favoriteId}": {
+      "schema": "UserFavorite",
+      "description": "Personal saved favorites"
+    },
+    "/users/{userId}/activity/{activityId}": {
+      "schema": "UserActivity",
+      "description": "User activity audit log"
     }
   }
 }

@@ -2,12 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Global Safety Net: Default deny
+    // Default Deny
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
@@ -16,8 +15,16 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'lucas.ferreyra@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
     function incoming() {
@@ -29,44 +36,56 @@ service cloud.firestore {
     }
 
     // Validation for UserProfile
-    function isValidUserProfile(data) {
-      return data.keys().hasAll(['userId', 'name', 'email', 'createdAt'])
-        && data.keys().hasOnly(['userId', 'name', 'email', 'createdAt'])
-        && data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'userId', 'name', 'email', 'role', 'createdAt'])
+        && data.id is string && data.id == request.auth.uid
+        && data.userId is string && data.userId == request.auth.uid
         && data.name is string && data.name.size() > 0 && data.name.size() <= 100
         && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.role in ['admin', 'user']
+        && (data.role == 'user' || request.auth.token.email == 'lucas.ferreyra@gmail.com')
         && data.createdAt is string && data.createdAt.size() <= 64;
     }
 
-    // Validation for SearchRecord
-    function isValidSearchRecord(data) {
-      return data.keys().hasAll(['userId', 'query', 'title', 'resultSummary', 'createdAt'])
-        && data.keys().hasOnly(['userId', 'query', 'title', 'resultSummary', 'createdAt'])
-        && data.userId is string && data.userId == request.auth.uid && data.userId.size() <= 128
-        && data.query is string && data.query.size() > 0 && data.query.size() <= 150
-        && data.title is string && data.title.size() > 0 && data.title.size() <= 150
-        && data.resultSummary is string && data.resultSummary.size() <= 500
-        && data.createdAt is string && data.createdAt.size() <= 64;
-    }
-
-    // Users collection: Private user documents
+    // Users Collection
     match /users/{userId} {
-      allow get: if isOwner(userId) && isValidId(userId);
-      allow list: if false; // Blanket user listing forbidden
-      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
-      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming())
-        && incoming().userId == existing().userId
-        && incoming().createdAt == existing().createdAt;
-      allow delete: if isOwner(userId) && isValidId(userId);
-    }
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(incoming());
+      allow update: if isValidId(userId) && (
+        (isOwner(userId) && isValidUser(incoming()) && incoming().userId == existing().userId && incoming().createdAt == existing().createdAt && (incoming().role == existing().role || isAdmin()))
+        || isAdmin()
+      );
+      allow delete: if isAdmin() && isValidId(userId);
 
-    // Searches collection: Capped personal search history
-    match /searches/{searchId} {
-      allow get: if isSignedIn() && isValidId(searchId) && existing().userId == request.auth.uid;
-      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && isValidId(searchId) && isValidSearchRecord(incoming());
-      allow update: if false; // Search records are immutable snapshots
-      allow delete: if isSignedIn() && isValidId(searchId) && existing().userId == request.auth.uid;
+      // Subcollection: Reflections
+      match /reflections/{reflectionId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(reflectionId)
+          && incoming().userId == request.auth.uid
+          && incoming().content is string && incoming().content.size() <= 2000;
+        allow delete: if isOwner(userId) && isValidId(reflectionId);
+      }
+
+      // Subcollection: Favorites
+      match /favorites/{favoriteId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(favoriteId)
+          && incoming().userId == request.auth.uid
+          && incoming().title is string && incoming().title.size() <= 200;
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(favoriteId);
+      }
+
+      // Subcollection: Activity
+      match /activity/{activityId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidId(activityId)
+          && incoming().userId == request.auth.uid
+          && incoming().action in ['search', 'protocol', 'login', 'signup'];
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
     }
   }
 }

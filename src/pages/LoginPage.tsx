@@ -266,13 +266,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                   className="w-full pl-12 pr-24 py-3.5 rounded-full bio-pill-capsule text-sm outline-none focus:border-[#8F3722] transition-all text-[#111111] dark:text-[#FFF4ED] placeholder:text-[#4B5563] font-medium border border-[#E8B8A6]/50"
                 />
                 {!isSignUp && (
-                  <button
-                    type="button"
-                    onClick={() => alert('Para la versión demo, podés ingresar directamente con el botón de usuario de prueba.')}
-                    className="absolute right-2 px-2.5 py-1 rounded-full text-[11px] text-[#374151] hover:text-[#8F3722] bg-white/90 dark:bg-white/10 border border-[#E8B8A6]/50 dark:border-white/10 transition-colors font-semibold"
-                  >
-                    olvidé
-                  </button>
+                  <span className="absolute right-3 text-[11px] text-[#374151]/60 dark:text-white/40 font-medium">
+                    seguro
+                  </span>
                 )}
               </div>
 
