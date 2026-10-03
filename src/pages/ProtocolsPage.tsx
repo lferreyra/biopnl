@@ -54,23 +54,23 @@ export const ProtocolsPage: React.FC<ProtocolsPageProps> = ({
         <div className="relative z-10 max-w-xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-[#2A1F1A]/85 backdrop-blur-md text-[#8F3722] dark:text-[#E07853] text-xs font-bold border border-white/80 dark:border-white/10 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Biblioteca de Herramientas & PNL</span>
+            <span>Pausas de Calma & Respiración</span>
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-5xl font-bold text-[#111111] dark:text-[#FFF4ED] tracking-tight leading-tight">
-            Protocolos de Escucha Interior
+          <h1 className="font-heading text-3xl sm:text-5xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight leading-tight">
+            Ejercicios para Calmar el Cuerpo
           </h1>
 
-          <p className="text-sm sm:text-base text-[#262626] dark:text-[#BDB0A8] font-normal leading-relaxed">
-            Ejercicios estructurados para conectar con tu sabiduría corporal, reencuadrar intenciones positivas y anclar estados de serenidad cuando el cuerpo te envía señales.
+          <p className="text-sm sm:text-base text-[#3D3532] dark:text-[#E2D7D1] font-normal leading-relaxed">
+            Prácticas sencillas de 3 a 5 minutos para aflojar tensiones musculares, calmar la mente y recuperar la tranquilidad en cualquier momento del día.
           </p>
 
-          <div className="pt-1 flex items-center gap-3 text-xs text-[#374151] dark:text-[#BDB0A8] font-medium">
+          <div className="pt-1 flex items-center gap-3 text-xs text-[#3D3532] dark:text-[#E2D7D1] font-medium">
             <span className="font-bold text-[#8F3722] dark:text-[#E07853]">7 prácticas guiadas</span>
             <span aria-hidden="true">·</span>
-            <span>Regulación somática</span>
+            <span>Respiración y calma</span>
             <span aria-hidden="true">·</span>
-            <span>Sin prescripción médica</span>
+            <span>100% Gratuitas</span>
           </div>
         </div>
       </motion.div>

@@ -1,61 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { UserProfile } from '../types';
-import { AuthService } from '../services/authService';
-import { Logo } from '../components/Logo';
-import { ThemeToggle } from '../components/ThemeToggle';
-import { MockupDevicesShowcase } from '../components/landing/MockupDevicesShowcase';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { UserProfile } from "../types";
+import { AuthService } from "../services/authService";
+import { Logo } from "../components/Logo";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { MockupDevicesShowcase } from "../components/landing/MockupDevicesShowcase";
+import { AppImages } from "../assets/images";
 import {
   Sparkles,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
-  Brain,
-  Wind,
-  ShieldCheck,
   Lock,
   Mail,
   User,
-  Heart,
+  ShieldCheck,
   Compass,
-  Check,
-  Clock,
-  Sparkle
-} from 'lucide-react';
+  Wind
+} from "lucide-react";
 
 interface LandingCarouselPageProps {
   onLoginSuccess: (user: UserProfile) => void;
-  initialSlide?: number;
+  currentUserEmail?: string;
 }
+
+const TOTAL_SLIDES = 5;
 
 export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
   onLoginSuccess,
-  initialSlide = 0
+  currentUserEmail = "lucas.ferreyra@gmail.com"
 }) => {
-  const [currentSlide, setCurrentSlide] = useState(initialSlide);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // Auth Form State for the final slide
+  // Auth Form State for Slide 4
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const TOTAL_SLIDES = 5;
-
-  const goToSlide = (index: number) => {
-    setDirection(index > currentSlide ? 1 : -1);
-    setCurrentSlide(index);
-    setAuthError(null);
+  const goToSlide = (newIndex: number) => {
+    setDirection(newIndex > currentSlide ? 1 : -1);
+    setCurrentSlide(newIndex);
   };
 
   const nextSlide = () => {
     if (currentSlide < TOTAL_SLIDES - 1) {
       setDirection(1);
       setCurrentSlide((prev) => prev + 1);
-      setAuthError(null);
     }
   };
 
@@ -63,44 +57,23 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
     if (currentSlide > 0) {
       setDirection(-1);
       setCurrentSlide((prev) => prev - 1);
-      setAuthError(null);
     }
   };
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
-        return;
-      }
-      if (e.key === 'ArrowRight') nextSlide();
-      if (e.key === 'ArrowLeft') prevSlide();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSlide]);
-
-  // Auth Handlers
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setAuthError(null);
-
     try {
       let user: UserProfile;
       if (isSignUp) {
-        if (!name.trim()) {
-          setAuthError('Por favor ingresá tu nombre completo.');
-          setIsLoading(false);
-          return;
-        }
-        user = await AuthService.signUpWithEmail(email, password, name);
+        user = await AuthService.signUp(email, password, name);
       } else {
         user = await AuthService.signInWithEmail(email, password);
       }
       onLoginSuccess(user);
     } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Error al autenticar.');
+      setAuthError(err instanceof Error ? err.message : "Error de autenticación.");
     } finally {
       setIsLoading(false);
     }
@@ -112,8 +85,8 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
     try {
       const user = await AuthService.signInWithGoogle();
       onLoginSuccess(user);
-    } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'Error al conectar con Google.');
+    } catch {
+      setAuthError("No se pudo iniciar sesión con Google.");
     } finally {
       setIsLoading(false);
     }
@@ -126,64 +99,82 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
       const user = await AuthService.signInAsAdmin();
       onLoginSuccess(user);
     } catch {
-      setAuthError('No se pudo acceder como administrador.');
+      setAuthError("No se pudo acceder como administrador.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Slide transition animation variants
+  // Smooth slide motion variants
   const slideVariants = {
     enter: (dir: number) => ({
-      x: dir > 0 ? 60 : -60,
+      x: dir > 0 ? 30 : -30,
       opacity: 0
     }),
     center: {
       x: 0,
       opacity: 1,
-      transition: { duration: 0.35, ease: 'easeOut' as const }
+      transition: { duration: 0.25, ease: "easeOut" as const }
     },
     exit: (dir: number) => ({
-      x: dir > 0 ? -60 : 60,
+      x: dir > 0 ? -30 : 30,
       opacity: 0,
-      transition: { duration: 0.22, ease: 'easeIn' as const }
+      transition: { duration: 0.16, ease: "easeIn" as const }
     })
   };
 
   const slideTitles = [
-    'Bienvenida',
-    'Biodecodificación',
-    'Protocolos PNL',
-    '100% Gratis',
-    'Acceso / Login'
+    "Bienvenida",
+    "Comprender tu cuerpo",
+    "Ejercicios de calma",
+    "100% Gratis",
+    "Acceso"
   ];
 
   return (
-    <div className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between text-[#111111] dark:text-[#FFF4ED] relative select-none transition-colors duration-300">
-      {/* Master Ambient Background Canvas */}
-      <div className="biopnl-ambient-canvas" />
+    <div className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between text-[#1A1412] dark:text-white relative select-none transition-colors duration-300">
+      {/* Dynamic Background Image: Adapted for Light and Dark modes */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* LIGHT MODE BACKGROUND: Luminous, warm morning arch edition */}
+        <img
+          src={AppImages.portalArchLight}
+          alt="Portal de luz y calma BioPNL"
+          className="w-full h-full object-cover object-[center_35%] scale-105 block dark:hidden transition-transform duration-700"
+        />
+        {/* LIGHT MODE ATMOSPHERIC OVERLAY: Gentle warm blur & soft gradient for maximum legibility */}
+        <div className="absolute inset-0 block dark:hidden bg-gradient-to-b from-[#FAF3EE]/60 via-[#FAF3EE]/45 to-[#FAF3EE]/80 backdrop-blur-[1.5px]" />
 
-      {/* Top Header Bar: Clean & separated (No middle clutter that interferes with titles) */}
-      <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between shrink-0 z-40 border-b border-[#E8B8A6]/25 dark:border-white/10 bg-[#FAF3EE]/40 dark:bg-[#140A07]/40 backdrop-blur-md">
+        {/* DARK MODE BACKGROUND: Mysterious, glowing deep amber arch & silhouette */}
+        <img
+          src={AppImages.portalArchDark}
+          alt="Portal de luz y calma interior"
+          className="w-full h-full object-cover object-[center_35%] scale-105 hidden dark:block transition-transform duration-700"
+        />
+        {/* DARK MODE ATMOSPHERIC OVERLAY: Deep cinematic chiaroscuro & golden glow */}
+        <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-black/60 via-black/45 to-black/80 backdrop-blur-[1px]" />
+      </div>
+
+      {/* Top Header Bar */}
+      <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between shrink-0 z-40 border-b border-[#E8B8A6]/30 dark:border-white/15 bg-[#FAF3EE]/75 dark:bg-black/45 backdrop-blur-md transition-colors duration-300">
         <div className="flex items-center gap-2">
           <Logo size="sm" />
-          <span className="hidden sm:inline-block text-[10px] text-[#374151] dark:text-[#BDB0A8] uppercase tracking-wider font-bold pl-1 border-l border-[#E8B8A6]/40 dark:border-white/10">
-            Biodecodificación & PNL
+          <span className="hidden sm:inline-block text-xs text-[#3D3532] dark:text-white/80 font-medium pl-2 border-l border-[#E8B8A6]/40 dark:border-white/20">
+            Bienestar & Escucha Corporal
           </span>
         </div>
 
-        {/* Right side: Step badge & skip to login & theme toggle */}
+        {/* Right side: Free badge & Skip to login & theme toggle */}
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800/40">
+          <span className="text-[11px] sm:text-xs font-semibold text-emerald-900 dark:text-emerald-300 bg-emerald-100/90 dark:bg-emerald-950/70 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-500/40">
             100% Gratis
           </span>
 
           {currentSlide < TOTAL_SLIDES - 1 && (
             <button
               onClick={() => goToSlide(TOTAL_SLIDES - 1)}
-              className="text-xs font-bold text-[#8F3722] dark:text-[#E07853] hover:underline px-3 py-1 rounded-full bg-white/90 dark:bg-white/10 border border-[#E8B8A6]/50 dark:border-white/10 transition-colors cursor-pointer shadow-2xs"
+              className="text-xs font-bold text-[#8F3722] dark:text-white hover:text-[#7A2818] dark:hover:text-[#F47A45] px-3 py-1 rounded-full bg-white/90 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 border border-[#E8B8A6]/60 dark:border-white/25 transition-all cursor-pointer shadow-2xs backdrop-blur-md"
             >
-              Iniciar sesión
+              Entrar
             </button>
           )}
 
@@ -191,13 +182,11 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
         </div>
       </header>
 
-      {/* Main Viewport Content Area: Generous top headroom so titles never touch the header */}
-      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 flex-1 min-h-0 flex items-center justify-center relative z-20 overflow-hidden pt-2 pb-1">
+      {/* Main Viewport Content Area - Responsive, scroll-safe, never truncated */}
+      <main className="w-full max-w-4xl mx-auto px-4 sm:px-6 flex-1 min-h-0 flex flex-col justify-center relative z-20 overflow-y-auto sm:overflow-hidden py-2 sm:py-3">
         <AnimatePresence custom={direction} mode="wait">
 
-          {/* ============================================================== */}
-          {/* SLIDE 0: HERO WELCOME & 3D FLOATING DEVICES SHOWCASE           */}
-          {/* ============================================================== */}
+          {/* SLIDE 0: BIENVENIDA */}
           {currentSlide === 0 && (
             <motion.div
               key="slide-0"
@@ -206,70 +195,57 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
               initial="enter"
               animate="center"
               exit="exit"
-              className="w-full h-full max-h-full flex items-center justify-center"
+              className="w-full my-auto flex items-center justify-center"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center w-full">
-                {/* Left: Concise Value Proposition */}
-                <div className="lg:col-span-6 space-y-2.5 sm:space-y-3.5 text-left">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/95 dark:bg-white/10 text-[#8F3722] dark:text-[#E07853] text-[10px] font-bold border border-[#E8B8A6]/50 dark:border-white/15 shadow-2xs">
-                    <Sparkles className="w-3 h-3" />
-                    <span>Autoconocimiento somático & PNL</span>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center w-full">
+                <div className="lg:col-span-7 space-y-3 text-center lg:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/15 backdrop-blur-md text-[#8F3722] dark:text-[#F47A45] text-xs font-bold border border-[#E8B8A6]/50 dark:border-white/20 shadow-2xs">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>BioPNL · Bienestar Cotidiano</span>
                   </div>
 
-                  <h1 className="font-heading text-2xl sm:text-3xl lg:text-[2.25rem] font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED] leading-[1.12]">
-                    Tu cuerpo habla. <br />
-                    <span className="text-[#8F3722] dark:text-[#E07853]">Aprendé a escucharlo</span> sin juicios.
+                  <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#1A1412] dark:text-white leading-tight drop-shadow-xs">
+                    Aprendé a escuchar <br className="hidden sm:inline" />
+                    <span className="text-[#8F3722] dark:text-[#F47A45]">lo que tu cuerpo siente.</span>
                   </h1>
 
-                  <p className="text-xs sm:text-sm text-[#262626] dark:text-[#D1C7BD] leading-relaxed max-w-sm font-normal">
-                    Comprendé qué emoción o vivencia refleja tu síntoma físico según la biodecodificación, y regulá tu calma con protocolos interactivos de PNL.
+                  <p className="text-sm sm:text-base text-[#3D3532] dark:text-white/90 leading-relaxed max-w-md mx-auto lg:mx-0 font-normal">
+                    Descubrí qué emoción expresa cada dolor o molestia y recuperá la calma con ejercicios simples de respiración.
                   </p>
 
-                  {/* 100% Free Guarantee Pill */}
-                  <div className="p-2 sm:p-2.5 rounded-xl bg-white/90 dark:bg-white/5 border border-emerald-500/40 flex items-center gap-2 shadow-2xs max-w-sm">
-                    <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#111111] dark:text-[#FFF4ED] leading-tight">
-                        100% Gratuito y Libre
-                      </p>
-                      <p className="text-[10px] text-[#374151] dark:text-[#BDB0A8] truncate">
-                        Sin tarjeta, sin suscripciones ocultas ni publicidad.
-                      </p>
-                    </div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50/90 dark:bg-emerald-950/70 border border-emerald-300 dark:border-emerald-500/40 text-emerald-900 dark:text-emerald-300 text-xs font-medium backdrop-blur-md">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>100% Gratuito · Sin tarjetas ni cobros</span>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="pt-0.5 flex flex-wrap items-center gap-2.5">
+                  <div className="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
                     <button
                       onClick={nextSlide}
-                      className="min-h-[38px] px-5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-95 active:scale-98 transition-all cursor-pointer"
+                      className="min-h-[40px] px-5 sm:px-6 rounded-full bg-[#181311] dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-[#140A07] font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg active:scale-98 transition-all cursor-pointer"
                     >
-                      <span>Conocer beneficios</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Descubrir cómo funciona</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
 
                     <button
                       onClick={() => goToSlide(TOTAL_SLIDES - 1)}
-                      className="min-h-[38px] px-4 rounded-full bio-pill-capsule font-bold text-xs text-[#111111] dark:text-[#FFF4ED] hover:border-[#8F3722]/50 transition-colors cursor-pointer"
+                      className="min-h-[40px] px-4 rounded-full bg-white/85 dark:bg-white/15 hover:bg-white dark:hover:bg-white/25 backdrop-blur-md text-[#181311] dark:text-white border border-[#E8B8A6]/60 dark:border-white/30 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
                     >
-                      Acceder gratis
+                      Ir al acceso
                     </button>
                   </div>
                 </div>
 
-                {/* Right: Floating Devices Mockup (calibrated size) */}
-                <div className="lg:col-span-6 flex justify-center items-center">
-                  <MockupDevicesShowcase activeSlide={0} onExploreClick={nextSlide} />
+                <div className="hidden lg:flex lg:col-span-5 justify-center items-center">
+                  <div className="scale-90 origin-center drop-shadow-2xl">
+                    <MockupDevicesShowcase activeSlide={0} onExploreClick={nextSlide} />
+                  </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ============================================================== */}
-          {/* SLIDE 1: BENEFIT 1 - BIODECODIFICACIÓN CONSCIENTE              */}
-          {/* ============================================================== */}
+          {/* SLIDE 1: COMPRENDER TU CUERPO */}
           {currentSlide === 1 && (
             <motion.div
               key="slide-1"
@@ -278,119 +254,59 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
               initial="enter"
               animate="center"
               exit="exit"
-              className="w-full h-full max-h-full flex items-center justify-center"
+              className="w-full my-auto flex items-center justify-center"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center w-full">
-                {/* Left: Summary */}
-                <div className="lg:col-span-6 space-y-2.5 sm:space-y-3 text-left">
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#8F3722]/15 dark:bg-[#E07853]/15 text-[#8F3722] dark:text-[#E07853] text-[10px] font-bold">
-                    <Compass className="w-3 h-3" />
-                    <span>Beneficio 1 · Comprensión Somática</span>
+                <div className="lg:col-span-6 space-y-3 text-center lg:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8F3722]/10 dark:bg-[#F47A45]/20 backdrop-blur-md text-[#8F3722] dark:text-[#F47A45] text-xs font-bold border border-[#8F3722]/20 dark:border-[#F47A45]/30">
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Paso 1 · Buscador de Síntomas</span>
                   </div>
 
-                  <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED] leading-tight">
-                    Descubrí qué emoción expresa tu cuerpo
+                  <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1412] dark:text-white leading-tight drop-shadow-xs">
+                    ¿Qué emoción hay detrás de lo que sentís?
                   </h2>
 
-                  <p className="text-xs text-[#262626] dark:text-[#D1C7BD] leading-relaxed font-normal">
-                    Cada molestia o tensión reiterada (como migrañas, dolor lumbar o pesadez digestiva) suele conectar con vivencias retenidas. BioPNL te ayuda a descifrarlo con lecturas respetuosas.
+                  <p className="text-sm sm:text-base text-[#3D3532] dark:text-white/90 leading-relaxed max-w-md mx-auto lg:mx-0 font-normal">
+                    Escribí cualquier molestia —como cuello, espalda o acidez— y descubrí qué situación o preocupación la está causando, con palabras simples.
                   </p>
 
-                  <div className="space-y-1.5 pt-0.5">
-                    <div className="flex items-start gap-2">
-                      <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                      <p className="text-xs text-[#262626] dark:text-[#D1C7BD]">
-                        <strong>Nodos emocionales:</strong> Identificá sobreexigencia, límites no expresados o temor.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                      <p className="text-xs text-[#262626] dark:text-[#D1C7BD]">
-                        <strong>Preguntas fértiles:</strong> Autoindagación para reflexionar en tu cuaderno.
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                      <p className="text-xs text-[#262626] dark:text-[#D1C7BD]">
-                        <strong>Enfoque complementario:</strong> Sin culpas ni dogmatismos. La medicina atiende el cuerpo; acá acompañamos lo emocional.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-1">
+                  <div className="pt-1 flex justify-center lg:justify-start">
                     <button
                       onClick={nextSlide}
-                      className="min-h-[38px] px-5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-95 cursor-pointer"
+                      className="min-h-[40px] px-5 sm:px-6 rounded-full bg-[#181311] dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-[#140A07] font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg cursor-pointer"
                     >
-                      <span>Ver protocolos de PNL</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Ver ejercicios de calma</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                {/* Right: Live Symptom Exploration Preview Card */}
-                <div className="lg:col-span-6 flex justify-center">
-                  <div className="w-full max-w-sm bio-glass-card rounded-[24px] p-4 sm:p-5 border border-white/95 dark:border-white/10 shadow-lg space-y-2.5">
-                    <div className="flex items-center justify-between text-[10px] text-[#8F3722] dark:text-[#E07853] font-bold uppercase tracking-wider">
-                      <span className="flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
-                        Lectura de ejemplo
-                      </span>
-                      <span className="text-[#374151] dark:text-[#BDB0A8]">
-                        Caso real
-                      </span>
+                <div className="lg:col-span-6 flex justify-center w-full">
+                  <div className="w-full max-w-sm rounded-[24px] p-4 sm:p-5 bg-white/85 dark:bg-black/65 backdrop-blur-xl border border-[#E8B8A6]/40 dark:border-white/20 shadow-2xl space-y-2.5 text-left text-[#1A1412] dark:text-white">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#8F3722] dark:text-[#F47A45]">
+                      <span className="uppercase tracking-wider">Ejemplo común</span>
+                      <span className="text-[#3D3532]/70 dark:text-white/60 text-[11px] font-normal">Consulta frecuente</span>
                     </div>
 
-                    <div>
-                      <span className="text-[9px] text-[#374151] dark:text-[#BDB0A8] uppercase font-bold">
-                        Síntoma consultado
-                      </span>
-                      <h3 className="font-heading text-base sm:text-lg font-bold text-[#111111] dark:text-[#FFF4ED]">
-                        Migrañas y Cefaleas Tensionales
-                      </h3>
+                    <h3 className="font-heading text-lg font-bold text-[#1A1412] dark:text-white">
+                      Dolor de cuello y hombros
+                    </h3>
+
+                    <div className="p-3 rounded-xl bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/15 text-xs sm:text-sm text-[#1A1412] dark:text-white/95 leading-relaxed">
+                      <strong>Significado:</strong> Cargar con responsabilidades de otros y dificultad para decir que no o pedir ayuda.
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-white/80 dark:bg-white/5 border border-[#E8B8A6]/40 dark:border-white/10 text-xs text-[#111111] dark:text-[#FFF4ED] leading-relaxed">
-                      <strong>Resumen:</strong> Vinculada frecuentemente a hipercontrol mental, temor al error y necesidad de solucionar imprevistos en soledad.
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-[9px] font-bold text-[#8F3722] dark:text-[#E07853] uppercase tracking-wider">
-                        Nodos emocionales:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        <span className="px-2 py-0.5 rounded-full bg-white dark:bg-white/10 text-[9px] font-bold text-[#111111] dark:text-white border border-[#E8B8A6]/40">
-                          Hipervigilancia
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full bg-white dark:bg-white/10 text-[9px] font-bold text-[#111111] dark:text-white border border-[#E8B8A6]/40">
-                          Autoexigencia
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full bg-white dark:bg-white/10 text-[9px] font-bold text-[#111111] dark:text-white border border-[#E8B8A6]/40">
-                          Soltar el control
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-2 rounded-xl bg-[#8F3722]/10 dark:bg-[#E07853]/15 border border-[#8F3722]/20 text-[10px] text-[#111111] dark:text-[#FFF4ED] italic">
-                      "¿Qué situación presente sentís que debés resolver mentalmente vos solo/a?"
-                    </div>
+                    <p className="text-xs text-[#8F3722] dark:text-[#F47A45] italic">
+                      "¿Qué carga pesada estás llevando hoy que podrías soltar?"
+                    </p>
                   </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ============================================================== */}
-          {/* SLIDE 2: BENEFIT 2 - PROTOCOLOS DE PNL & SOMÁTICA              */}
-          {/* ============================================================== */}
+          {/* SLIDE 2: EJERCICIOS SENCILLOS DE CALMA */}
           {currentSlide === 2 && (
             <motion.div
               key="slide-2"
@@ -399,109 +315,79 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
               initial="enter"
               animate="center"
               exit="exit"
-              className="w-full h-full max-h-full flex items-center justify-center"
+              className="w-full my-auto flex items-center justify-center"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center w-full">
-                {/* Left: Summary */}
-                <div className="lg:col-span-6 space-y-2.5 sm:space-y-3 text-left">
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#8F3722]/15 dark:bg-[#E07853]/15 text-[#8F3722] dark:text-[#E07853] text-[10px] font-bold">
-                    <Brain className="w-3 h-3" />
-                    <span>Beneficio 2 · Herramientas Aplicadas</span>
+                <div className="lg:col-span-6 space-y-3 text-center lg:text-left">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8F3722]/10 dark:bg-[#F47A45]/20 backdrop-blur-md text-[#8F3722] dark:text-[#F47A45] text-xs font-bold border border-[#8F3722]/20 dark:border-[#F47A45]/30">
+                    <Wind className="w-3.5 h-3.5" />
+                    <span>Paso 2 · Pausas de Calma</span>
                   </div>
 
-                  <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED] leading-tight">
-                    Protocolos guiados para calmar el cuerpo
+                  <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1412] dark:text-white leading-tight drop-shadow-xs">
+                    Ejercicios guiados de 3 minutos.
                   </h2>
 
-                  <p className="text-xs text-[#262626] dark:text-[#D1C7BD] leading-relaxed font-normal">
-                    La comprensión teórica se transforma cuando el cuerpo lo experimenta. BioPNL incluye ejercicios interactivos paso a paso con cronómetro para regular el sistema nervioso.
+                  <p className="text-sm sm:text-base text-[#3D3532] dark:text-white/90 leading-relaxed max-w-md mx-auto lg:mx-0 font-normal">
+                    Pausas simples con cronómetro para aflojar la tensión en el pecho y los hombros, bajar la ansiedad y recuperar tu centro.
                   </p>
 
-                  <div className="grid grid-cols-3 gap-2 pt-0.5">
-                    <div className="p-2 rounded-xl bg-white/85 dark:bg-white/5 border border-white/90 dark:border-white/10 shadow-2xs text-center">
-                      <Wind className="w-4 h-4 text-teal-700 dark:text-teal-400 mx-auto mb-0.5" />
-                      <p className="text-[10px] font-bold text-[#111111] dark:text-[#FFF4ED] leading-tight">Respiración 4-7-8</p>
-                      <p className="text-[8px] text-[#374151] dark:text-[#BDB0A8] mt-0.5">Calma en 4 min</p>
-                    </div>
-
-                    <div className="p-2 rounded-xl bg-white/85 dark:bg-white/5 border border-white/90 dark:border-white/10 shadow-2xs text-center">
-                      <Sparkle className="w-4 h-4 text-[#8F3722] dark:text-[#E07853] mx-auto mb-0.5" />
-                      <p className="text-[10px] font-bold text-[#111111] dark:text-[#FFF4ED] leading-tight">Reencuadre PNL</p>
-                      <p className="text-[8px] text-[#374151] dark:text-[#BDB0A8] mt-0.5">Intención positiva</p>
-                    </div>
-
-                    <div className="p-2 rounded-xl bg-white/85 dark:bg-white/5 border border-white/90 dark:border-white/10 shadow-2xs text-center">
-                      <Heart className="w-4 h-4 text-rose-700 dark:text-rose-400 mx-auto mb-0.5" />
-                      <p className="text-[10px] font-bold text-[#111111] dark:text-[#FFF4ED] leading-tight">Anclaje Somático</p>
-                      <p className="text-[8px] text-[#374151] dark:text-[#BDB0A8] mt-0.5">Asociación de paz</p>
-                    </div>
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-1.5 pt-1">
+                    <span className="px-2.5 py-1 rounded-full bg-white/80 dark:bg-white/15 backdrop-blur-md text-xs font-semibold text-[#1A1412] dark:text-white border border-[#E8B8A6]/40 dark:border-white/20">
+                      🫁 Respiración 4-7-8
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-white/80 dark:bg-white/15 backdrop-blur-md text-xs font-semibold text-[#1A1412] dark:text-white border border-[#E8B8A6]/40 dark:border-white/20">
+                      💡 Cambiar la mirada
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-white/80 dark:bg-white/15 backdrop-blur-md text-xs font-semibold text-[#1A1412] dark:text-white border border-[#E8B8A6]/40 dark:border-white/20">
+                      🕊️ Aflojar el cuerpo
+                    </span>
                   </div>
 
-                  <div className="pt-1">
+                  <div className="pt-1 flex justify-center lg:justify-start">
                     <button
                       onClick={nextSlide}
-                      className="min-h-[38px] px-5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-95 cursor-pointer"
+                      className="min-h-[40px] px-5 sm:px-6 rounded-full bg-[#181311] dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-[#140A07] font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg cursor-pointer"
                     >
-                      <span>¿Por qué es 100% gratis?</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <span>Ver privacidad y acceso</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                {/* Right: Interactive Protocol Preview Card */}
-                <div className="lg:col-span-6 flex justify-center">
-                  <div className="w-full max-w-sm bio-glass-card rounded-[24px] p-4 sm:p-5 border border-white/95 dark:border-white/10 shadow-lg space-y-2.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#8F3722] dark:text-[#E07853] uppercase tracking-wider flex items-center gap-1 text-[10px]">
-                        <Wind className="w-3 h-3" />
-                        Protocolo Interactivo
-                      </span>
-                      <span className="flex items-center gap-1 font-bold text-[#111111] dark:text-white bg-white/80 dark:bg-white/10 px-2 py-0.5 rounded-full text-[9px]">
-                        <Clock className="w-2.5 h-2.5 text-[#8F3722]" /> 4 min
+                <div className="lg:col-span-6 flex justify-center w-full">
+                  <div className="w-full max-w-sm rounded-[24px] p-4 sm:p-5 bg-white/85 dark:bg-black/65 backdrop-blur-xl border border-[#E8B8A6]/40 dark:border-white/20 shadow-2xl space-y-2.5 text-left text-[#1A1412] dark:text-white">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#8F3722] dark:text-[#F47A45]">
+                      <span>Práctica guiada</span>
+                      <span className="bg-black/5 dark:bg-white/15 px-2 py-0.5 rounded-full text-[11px] text-[#1A1412] dark:text-white">
+                        ⏱️ 4 min
                       </span>
                     </div>
 
-                    <div>
-                      <h3 className="font-heading text-base sm:text-lg font-bold text-[#111111] dark:text-[#FFF4ED]">
-                        Respiración 4-7-8 para Alivio
-                      </h3>
-                      <p className="text-[10px] text-[#374151] dark:text-[#BDB0A8]">
-                        Estimulación del nervio vago y desaceleración del pulso.
-                      </p>
-                    </div>
+                    <h3 className="font-heading text-lg font-bold text-[#1A1412] dark:text-white">
+                      Respiración 4-7-8
+                    </h3>
 
-                    {/* Progress dots */}
-                    <div className="flex gap-1">
-                      <div className="h-1 flex-1 rounded-full bg-[#8F3722]" />
-                      <div className="h-1 flex-1 rounded-full bg-[#8F3722]" />
-                      <div className="h-1 flex-1 rounded-full bg-black/15 dark:bg-white/20" />
-                      <div className="h-1 flex-1 rounded-full bg-black/15 dark:bg-white/20" />
-                    </div>
-
-                    {/* Step instruction */}
-                    <div className="p-2.5 rounded-xl bg-white/80 dark:bg-white/5 border border-white/90 dark:border-white/10 space-y-1">
-                      <div className="flex items-center justify-between text-[10px] font-bold text-[#8F3722] dark:text-[#E07853]">
-                        <span>Paso 2 de 4: Retención en calma</span>
-                        <span className="font-mono bg-[#8F3722]/15 px-1.5 py-0.5 rounded-xs">07s</span>
+                    <div className="p-3 rounded-xl bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/15 space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-[#8F3722] dark:text-[#F47A45]">
+                        <span>Paso 2: Retener el aire</span>
+                        <span className="font-mono bg-[#8F3722]/15 dark:bg-[#F47A45]/20 px-1.5 py-0.5 rounded-xs text-[#8F3722] dark:text-white">07s</span>
                       </div>
-                      <p className="text-xs text-[#111111] dark:text-[#FFF4ED] leading-relaxed">
-                        "Sostené el aire en los pulmones sin forzar. Notá cómo la quietud se expande hacia hombros y mandíbula."
+                      <p className="text-xs sm:text-sm text-[#1A1412] dark:text-white/95 leading-relaxed">
+                        Sostené el aire en calma sin forzar. Notá cómo se afloja la mandíbula.
                       </p>
                     </div>
 
-                    <div className="pt-0.5 flex items-center justify-between text-[10px] font-bold text-[#8F3722]">
-                      <span>✓ Cronómetro integrado</span>
-                      <span>✓ Secuencias guiadas</span>
-                    </div>
+                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">
+                      ✓ Cronómetro guiado incluido
+                    </p>
                   </div>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ============================================================== */}
-          {/* SLIDE 3: BENEFIT 3 - 100% GRATIS & PRIVACIDAD TOTAL            */}
-          {/* ============================================================== */}
+          {/* SLIDE 3: 100% GRATIS & PRIVADO */}
           {currentSlide === 3 && (
             <motion.div
               key="slide-3"
@@ -510,93 +396,53 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
               initial="enter"
               animate="center"
               exit="exit"
-              className="w-full h-full max-h-full flex items-center justify-center"
+              className="w-full my-auto flex items-center justify-center"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center w-full">
-                {/* Left: 100% Free explanation */}
-                <div className="lg:col-span-6 space-y-2.5 sm:space-y-3 text-left">
-                  <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 text-[10px] font-bold border border-emerald-300 dark:border-emerald-800">
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>Sin costo · 100% Gratuito garantizado</span>
+              <div className="w-full max-w-md mx-auto text-center space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-300 text-xs font-bold border border-emerald-300 dark:border-emerald-500/40 backdrop-blur-md">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Sin costo · 100% Gratuito</span>
+                </div>
+
+                <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1412] dark:text-white leading-tight drop-shadow-xs">
+                  Tu espacio seguro y sin sorpresas.
+                </h2>
+
+                <p className="text-sm sm:text-base text-[#3D3532] dark:text-white/90 leading-relaxed max-w-sm mx-auto font-normal">
+                  BioPNL es libre y accesible para todos. Sin muros de pago, sin publicidad y con absoluta privacidad para tus consultas.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                  <div className="p-3 rounded-xl bg-white/85 dark:bg-black/65 backdrop-blur-xl border border-[#E8B8A6]/40 dark:border-emerald-500/40">
+                    <p className="text-xs font-bold text-[#1A1412] dark:text-white">Búsquedas</p>
+                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">Ilimitadas</p>
                   </div>
 
-                  <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED] leading-tight">
-                    Acceso libre para todos. Sin muros de pago.
-                  </h2>
-
-                  <p className="text-xs text-[#262626] dark:text-[#D1C7BD] leading-relaxed font-normal">
-                    Muchas apps te exigen tarjeta o te bloquean tras unos días con cobros mensuales. <strong>BioPNL es 100% libre y gratuito</strong>: creemos que el autoconocimiento debe ser accesible.
-                  </p>
-
-                  <div className="space-y-1.5 pt-0.5">
-                    <div className="p-2 rounded-xl bg-white/90 dark:bg-white/5 border border-emerald-500/30 flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#111111] dark:text-[#FFF4ED]">Consultas de síntomas ilimitadas</span>
-                      <span className="font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full text-[9px]">Gratis siempre</span>
-                    </div>
-
-                    <div className="p-2 rounded-xl bg-white/90 dark:bg-white/5 border border-emerald-500/30 flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#111111] dark:text-[#FFF4ED]">Todos los protocolos PNL desbloqueados</span>
-                      <span className="font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full text-[9px]">Acceso total</span>
-                    </div>
-
-                    <div className="p-2 rounded-xl bg-white/90 dark:bg-white/5 border border-emerald-500/30 flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#111111] dark:text-[#FFF4ED]">Exportación de resúmenes en PDF</span>
-                      <span className="font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full text-[9px]">Sin costo extra</span>
-                    </div>
+                  <div className="p-3 rounded-xl bg-white/85 dark:bg-black/65 backdrop-blur-xl border border-[#E8B8A6]/40 dark:border-emerald-500/40">
+                    <p className="text-xs font-bold text-[#1A1412] dark:text-white">Ejercicios</p>
+                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">Acceso total</p>
                   </div>
 
-                  <div className="pt-1">
-                    <button
-                      onClick={nextSlide}
-                      className="min-h-[38px] px-5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-95 cursor-pointer"
-                    >
-                      <span>Ingresar a la app (Último paso)</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                  <div className="p-3 rounded-xl bg-white/85 dark:bg-black/65 backdrop-blur-xl border border-[#E8B8A6]/40 dark:border-emerald-500/40">
+                    <p className="text-xs font-bold text-[#1A1412] dark:text-white">Privacidad</p>
+                    <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">100% segura</p>
                   </div>
                 </div>
 
-                {/* Right: Trust & Privacy Card */}
-                <div className="lg:col-span-6 flex justify-center">
-                  <div className="w-full max-w-sm bio-glass-card rounded-[24px] p-4 sm:p-5 border border-white/95 dark:border-white/10 shadow-lg space-y-2.5 text-center">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-2xs">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-
-                    <div>
-                      <h3 className="font-heading text-base sm:text-lg font-bold text-[#111111] dark:text-[#FFF4ED]">
-                        Confidencialidad Garantizada
-                      </h3>
-                      <p className="text-[11px] text-[#262626] dark:text-[#BDB0A8] mt-0.5 leading-relaxed">
-                        Tus consultas y reflexiones quedan guardadas de manera privada. No hay publicidad ni venta de datos.
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-white/70 dark:bg-white/5 border border-white/80 dark:border-white/10 text-left text-[10px] space-y-0.5">
-                      <div className="flex items-center gap-1 font-bold text-[#111111] dark:text-white">
-                        <Lock className="w-3 h-3 text-[#8F3722]" />
-                        <span>Formas de acceso:</span>
-                      </div>
-                      <p className="text-[#374151] dark:text-[#BDB0A8]">
-                        Con Google en 1 clic o con tu correo electrónico y contraseña.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={nextSlide}
-                      className="w-full py-2 rounded-full bg-[#8F3722] hover:bg-[#7A2818] text-white font-bold text-xs shadow-md transition-colors cursor-pointer"
-                    >
-                      Crear mi cuenta gratis ahora →
-                    </button>
-                  </div>
+                <div className="pt-2 flex justify-center">
+                  <button
+                    onClick={nextSlide}
+                    className="min-h-[40px] px-6 rounded-full bg-[#8F3722] dark:bg-[#F47A45] hover:bg-[#7A2818] dark:hover:bg-[#E06835] text-white font-bold text-xs sm:text-sm shadow-xl transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <span>Crear mi cuenta gratis</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ============================================================== */}
-          {/* SLIDE 4: FINAL SLIDE - FULL LOGIN & SIGN UP EXPERIENCE        */}
-          {/* ============================================================== */}
+          {/* SLIDE 4: ACCESO & LOGIN DIRECTO */}
           {currentSlide === 4 && (
             <motion.div
               key="slide-4"
@@ -605,188 +451,140 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
               initial="enter"
               animate="center"
               exit="exit"
-              className="w-full h-full max-h-full flex items-center justify-center"
+              className="w-full my-auto flex items-center justify-center"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-center w-full">
-                {/* Left: Summary Panel */}
-                <div className="hidden lg:flex lg:col-span-6 flex-col gap-3">
-                  <div className="relative rounded-[24px] p-5 overflow-hidden bio-glass-panel flex flex-col justify-between min-h-[250px] shadow-lg">
-                    {/* Glowing orb */}
-                    <div className="absolute top-1/2 -right-6 -translate-y-1/2 w-40 h-40 rounded-full bg-gradient-to-tr from-[#F47A45] via-[#E8B8A6] to-[#F6E7DF] opacity-75 blur-[2px] pointer-events-none" />
-
-                    <div className="relative z-10 flex items-center justify-between">
-                      <Logo size="sm" />
-                      <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-300">
-                        100% Gratis
-                      </span>
-                    </div>
-
-                    <div className="relative z-10 my-auto py-1 space-y-1">
-                      <h2 className="font-heading text-2xl font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED] leading-tight">
-                        Tu espacio <br />
-                        <span className="text-[#8F3722] dark:text-[#E07853]">de paz diaria.</span>
-                      </h2>
-                      <p className="text-xs text-[#262626] dark:text-[#BDB0A8] font-normal leading-relaxed">
-                        Consultá síntomas cuando lo necesites, realizá ejercicios de respiración y guardá tus reflexiones personales.
-                      </p>
-                    </div>
-
-                    <div className="relative z-10 pt-2 border-t border-[#E8B8A6]/40 dark:border-white/10 flex items-center justify-between text-[10px] text-[#262626] dark:text-[#BDB0A8]">
-                      <span className="italic">"El cuerpo expresa lo que las palabras callan."</span>
-                      <span className="text-[8px] font-bold text-[#8F3722] uppercase tracking-wider">
-                        PNL Consciente
-                      </span>
-                    </div>
+              <div className="w-full max-w-sm mx-auto">
+                <div className="rounded-[24px] p-4 sm:p-5 bg-white/90 dark:bg-black/70 backdrop-blur-2xl border border-[#E8B8A6]/50 dark:border-white/25 shadow-2xl text-[#1A1412] dark:text-white">
+                  <div className="text-center mb-2.5">
+                    <h3 className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-[#1A1412] dark:text-white">
+                      {isSignUp ? "Crear cuenta gratis" : "Iniciar sesión"}
+                    </h3>
+                    <p className="text-xs text-[#3D3532] dark:text-white/70 mt-0.5">
+                      {isSignUp ? "Empezá en segundos" : "Bienvenido de vuelta a tu espacio"}
+                    </p>
                   </div>
 
-                  {/* Production Admin Access Card */}
-                  <div className="bio-dark-card rounded-xl p-3 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-[#E07853]" />
-                        <span>Acceso de Administrador</span>
-                      </h4>
-                      <p className="text-[10px] text-white/70">Lucas Ferreyra (lucas.ferreyra@gmail.com)</p>
-                    </div>
-                    <button
-                      onClick={handleAdminSignIn}
-                      disabled={isLoading}
-                      className="px-3 py-1 rounded-full bg-[#8F3722] hover:bg-[#A94A32] text-white text-xs font-bold transition-all cursor-pointer shrink-0"
-                    >
-                      Entrar como Admin →
-                    </button>
-                  </div>
-                </div>
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
+                    className="w-full min-h-[36px] px-4 rounded-xl bg-white hover:bg-neutral-50 dark:hover:bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-xs border border-black/10 dark:border-transparent cursor-pointer mb-2"
+                  >
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      />
+                    </svg>
+                    <span>Continuar con Google</span>
+                  </button>
 
-                {/* Right: Compact Auth Form (Fits strictly without scroll) */}
-                <div className="lg:col-span-6 w-full flex justify-center">
-                  <div className="w-full max-w-sm bio-glass-card rounded-[24px] p-4 sm:p-5 relative overflow-hidden shadow-xl border border-white/95">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center my-1.5">
+                    <div className="flex-1 border-t border-black/10 dark:border-white/20" />
+                    <span className="px-2 text-[10px] text-[#3D3532]/70 dark:text-white/60 uppercase tracking-wider font-semibold">
+                      o con tu correo
+                    </span>
+                    <div className="flex-1 border-t border-black/10 dark:border-white/20" />
+                  </div>
+
+                  {authError && (
+                    <div className="mb-2 p-2 rounded-xl bg-red-100 dark:bg-red-950/70 border border-red-300 dark:border-red-500/50 text-red-800 dark:text-red-200 text-xs">
+                      {authError}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAuthSubmit} className="space-y-2">
+                    {isSignUp && (
                       <div>
-                        <span className="text-[9px] uppercase font-bold text-[#8F3722] tracking-wider block">
-                          Acceso 100% Gratuito
-                        </span>
-                        <h3 className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[#111111] dark:text-[#FFF4ED]">
-                          {isSignUp ? 'Crear cuenta gratis' : 'Iniciar sesión'}
-                        </h3>
+                        <div className="relative">
+                          <User className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#3D3532]/50 dark:text-white/50" />
+                          <input
+                            type="text"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Tu nombre"
+                            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8F3722] dark:focus:ring-[#F47A45] text-[#1A1412] dark:text-white placeholder:text-[#3D3532]/50 dark:placeholder:text-white/40"
+                          />
+                        </div>
                       </div>
+                    )}
 
+                    <div>
+                      <div className="relative">
+                        <Mail className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#3D3532]/50 dark:text-white/50" />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="tu@email.com"
+                          className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8F3722] dark:focus:ring-[#F47A45] text-[#1A1412] dark:text-white placeholder:text-[#3D3532]/50 dark:placeholder:text-white/40"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="relative">
+                        <Lock className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#3D3532]/50 dark:text-white/50" />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Contraseña (mínimo 6 caracteres)"
+                          minLength={6}
+                          className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8F3722] dark:focus:ring-[#F47A45] text-[#1A1412] dark:text-white placeholder:text-[#3D3532]/50 dark:placeholder:text-white/40"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full min-h-[38px] mt-1.5 py-2 rounded-xl bg-[#8F3722] dark:bg-[#F47A45] hover:bg-[#7A2818] dark:hover:bg-[#E06835] text-white font-bold text-xs sm:text-sm shadow-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>{isLoading ? "Conectando..." : isSignUp ? "Registrarme gratis" : "Entrar a BioPNL"}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <div className="text-center pt-1">
                       <button
                         type="button"
                         onClick={() => {
                           setIsSignUp(!isSignUp);
                           setAuthError(null);
                         }}
-                        className="text-[11px] font-bold text-[#8F3722] dark:text-[#E07853] hover:underline px-2.5 py-0.5 rounded-full bg-white/90 dark:bg-white/10 border border-[#E8B8A6]/40 cursor-pointer"
+                        className="text-xs text-[#8F3722] dark:text-[#F47A45] hover:underline font-semibold cursor-pointer"
                       >
-                        {isSignUp ? 'Ya tengo cuenta' : 'Crear cuenta'}
+                        {isSignUp
+                          ? "¿Ya tenés cuenta? Iniciar sesión"
+                          : "¿Primera vez aquí? Crear cuenta gratis"}
                       </button>
                     </div>
+                  </form>
 
-                    {/* Auth Error */}
-                    {authError && (
-                      <div className="mb-2.5 p-2 rounded-xl bg-[#8F3722]/15 border border-[#8F3722]/30 text-[#8F3722] text-xs font-bold">
-                        {authError}
-                      </div>
-                    )}
-
-                    {/* Google 1-Click Button */}
+                  <div className="mt-2 pt-1.5 border-t border-black/10 dark:border-white/15 flex items-center justify-center text-xs font-semibold">
                     <button
                       type="button"
-                      onClick={handleGoogleSignIn}
-                      disabled={isLoading}
-                      className="w-full min-h-[38px] px-3.5 rounded-full bio-pill-capsule text-[#111111] dark:text-[#FFF4ED] font-bold text-xs flex items-center justify-center gap-2 hover:border-[#8F3722]/50 active:scale-[0.99] transition-all cursor-pointer mb-2.5 shadow-2xs border border-[#E8B8A6]/40"
+                      onClick={handleAdminSignIn}
+                      className="text-[#3D3532] dark:text-white/80 hover:text-[#8F3722] dark:hover:text-white flex items-center gap-1.5 cursor-pointer text-[11px]"
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                      </svg>
-                      <span>Continuar con Google</span>
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#8F3722] dark:text-[#F47A45]" />
+                      <span>Acceso Administrador (Lucas)</span>
                     </button>
-
-                    <div className="relative flex items-center justify-center my-2">
-                      <div className="border-t border-[#E8B8A6]/40 dark:border-white/10 w-full" />
-                      <span className="px-2 text-[8px] uppercase tracking-wider text-[#374151] dark:text-[#BDB0A8] shrink-0 font-bold">
-                        o con email
-                      </span>
-                    </div>
-
-                    {/* Email / Password Form */}
-                    <form onSubmit={handleAuthSubmit} className="space-y-2">
-                      {isSignUp && (
-                        <div className="relative flex items-center">
-                          <div className="w-6 h-6 rounded-full bg-white dark:bg-white/10 flex items-center justify-center absolute left-1.5 text-[#374151] dark:text-[#BDB0A8] shadow-2xs">
-                            <User className="w-3 h-3" />
-                          </div>
-                          <input
-                            type="text"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Tu nombre completo"
-                            className="w-full pl-9 pr-3 py-1.5 rounded-full bio-pill-capsule text-xs outline-none focus:border-[#8F3722] transition-all text-[#111111] dark:text-[#FFF4ED] placeholder:text-[#4B5563] font-medium border border-[#E8B8A6]/50"
-                          />
-                        </div>
-                      )}
-
-                      <div className="relative flex items-center">
-                        <div className="w-6 h-6 rounded-full bg-white dark:bg-white/10 flex items-center justify-center absolute left-1.5 text-[#374151] dark:text-[#BDB0A8] shadow-2xs">
-                          <Mail className="w-3 h-3" />
-                        </div>
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="tu.email@ejemplo.com"
-                          className="w-full pl-9 pr-3 py-1.5 rounded-full bio-pill-capsule text-xs outline-none focus:border-[#8F3722] transition-all text-[#111111] dark:text-[#FFF4ED] placeholder:text-[#4B5563] font-medium border border-[#E8B8A6]/50"
-                        />
-                      </div>
-
-                      <div className="relative flex items-center">
-                        <div className="w-6 h-6 rounded-full bg-white dark:bg-white/10 flex items-center justify-center absolute left-1.5 text-[#374151] dark:text-[#BDB0A8] shadow-2xs">
-                          <Lock className="w-3 h-3" />
-                        </div>
-                        <input
-                          type="password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Contraseña"
-                          className="w-full pl-9 pr-3 py-1.5 rounded-full bio-pill-capsule text-xs outline-none focus:border-[#8F3722] transition-all text-[#111111] dark:text-[#FFF4ED] placeholder:text-[#4B5563] font-medium border border-[#E8B8A6]/50"
-                        />
-                      </div>
-
-                      <div className="pt-1 flex items-center justify-between gap-2">
-                        <p className="text-[8px] text-[#374151] dark:text-[#BDB0A8] leading-tight font-medium">
-                          100% Gratuito y confidencial.
-                        </p>
-
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] text-xs font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md disabled:opacity-50 shrink-0"
-                        >
-                          <span>{isSignUp ? 'Crear gratis' : 'Entrar'}</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </form>
-
-                    {/* Admin Access Shortcut */}
-                    <div className="mt-2 pt-2 border-t border-[#E8B8A6]/30 dark:border-white/10 flex items-center justify-center text-[11px] font-bold">
-                      <button
-                        type="button"
-                        onClick={handleAdminSignIn}
-                        className="text-[#8F3722] dark:text-[#E07853] hover:underline flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Acceso de Administrador (Lucas Ferreyra)</span>
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -796,44 +594,41 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
         </AnimatePresence>
       </main>
 
-      {/* Bottom Carousel Controls Footer Bar: Clean & ergonomic */}
-      <footer className="w-full max-w-6xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between shrink-0 z-40 border-t border-[#E8B8A6]/25 dark:border-white/10 bg-[#FAF3EE]/40 dark:bg-[#140A07]/40 backdrop-blur-md">
-        {/* Previous Button */}
+      {/* Bottom Carousel Controls Footer Bar */}
+      <footer className="w-full max-w-5xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between shrink-0 z-40 border-t border-[#E8B8A6]/30 dark:border-white/15 bg-[#FAF3EE]/75 dark:bg-black/45 backdrop-blur-md transition-colors duration-300">
         <button
           onClick={prevSlide}
           disabled={currentSlide === 0}
-          className="min-h-[34px] px-3 rounded-full bio-pill-capsule text-xs font-bold flex items-center gap-1.5 disabled:opacity-25 disabled:cursor-not-allowed hover:border-[#8F3722]/40 transition-all cursor-pointer shadow-2xs"
+          className="min-h-[34px] px-3 rounded-full bg-white/80 dark:bg-white/10 text-[#1A1412] dark:text-white text-xs sm:text-sm font-semibold flex items-center gap-1 disabled:opacity-25 disabled:cursor-not-allowed hover:bg-white dark:hover:bg-white/20 border border-[#E8B8A6]/50 dark:border-white/20 transition-all cursor-pointer shadow-2xs backdrop-blur-md"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Anterior</span>
         </button>
 
-        {/* Center: Stepper Dots & Current step label (Moved to footer for 100% clean top header) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: TOTAL_SLIDES }).map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}
-                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                className={`h-2 rounded-full transition-all cursor-pointer ${
                   currentSlide === idx
-                    ? 'w-5 bg-[#8F3722] dark:bg-[#E07853]'
-                    : 'w-1.5 bg-black/20 dark:bg-white/20 hover:bg-black/40'
+                    ? "w-5 bg-[#8F3722] dark:bg-[#F47A45]"
+                    : "w-2 bg-black/20 dark:bg-white/30 hover:bg-black/40 dark:hover:bg-white/50"
                 }`}
                 aria-label={`Ir al paso ${idx + 1}`}
               />
             ))}
           </div>
-          <span className="text-[10px] text-[#374151] dark:text-[#BDB0A8] font-bold">
-            {currentSlide + 1}/{TOTAL_SLIDES} · {slideTitles[currentSlide]}
+          <span className="text-xs text-[#3D3532] dark:text-white/80 font-semibold">
+            {currentSlide + 1} de {TOTAL_SLIDES} · {slideTitles[currentSlide]}
           </span>
         </div>
 
-        {/* Next / Proceed Button */}
         {currentSlide < TOTAL_SLIDES - 1 ? (
           <button
             onClick={nextSlide}
-            className="min-h-[34px] px-4 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] text-xs font-bold flex items-center gap-1.5 shadow-md hover:opacity-95 transition-all cursor-pointer"
+            className="min-h-[34px] px-4 rounded-full bg-[#181311] dark:bg-white hover:bg-neutral-800 dark:hover:bg-neutral-100 text-white dark:text-[#140A07] text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
           >
             <span>Siguiente</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -841,9 +636,9 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
         ) : (
           <button
             onClick={() => goToSlide(0)}
-            className="min-h-[34px] px-3 rounded-full bio-pill-capsule text-xs font-bold text-[#8F3722] dark:text-[#E07853] hover:border-[#8F3722]/40 transition-all cursor-pointer shadow-2xs"
+            className="min-h-[34px] px-3 rounded-full bg-white/80 dark:bg-white/15 text-[#1A1412] dark:text-white hover:bg-white dark:hover:bg-white/25 border border-[#E8B8A6]/50 dark:border-white/25 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
           >
-            Volver al inicio
+            Inicio
           </button>
         )}
       </footer>

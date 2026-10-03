@@ -6,7 +6,9 @@ import { RecentSearches } from '../components/RecentSearches';
 import { ProtocolCard } from '../components/ProtocolCard';
 import { Disclaimer } from '../components/Disclaimer';
 import { AppImages } from '../assets/images';
-import { Sparkles, BookOpen, Compass, ArrowRight } from 'lucide-react';
+import { DailyReflectionCard } from '../components/DailyReflectionCard';
+import { BreathingProgressChart } from '../components/BreathingProgressChart';
+import { Sparkles, BookOpen, Compass, ArrowRight, Wind } from 'lucide-react';
 import { premiumEase, fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
 interface DashboardPageProps {
@@ -64,19 +66,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#241A15] text-[#8F3722] dark:text-[#E07853] text-xs font-bold border border-[#E8B8A6]/50 dark:border-white/10 mb-3.5 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Espacio de introspección personal</span>
+            <span>Tu espacio de bienestar y calma</span>
           </div>
 
-          <h1 className="font-heading text-4xl sm:text-5xl font-semibold text-[#111111] dark:text-[#FFF4ED] tracking-tight leading-tight">
+          <h1 className="font-heading text-4xl sm:text-5xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight leading-tight">
             Hola, {user.name}
           </h1>
 
-          <p className="mt-2 text-base sm:text-xl text-[#262626] dark:text-[#BDB0A8] font-normal leading-relaxed">
-            ¿Qué te gustaría explorar hoy?
+          <p className="mt-2 text-base sm:text-xl text-[#2E2420] dark:text-[#EAE0D9] font-normal leading-relaxed">
+            ¿Qué molestia o dolor sentís hoy?
           </p>
 
-          <p className="mt-1.5 text-xs sm:text-sm text-[#374151] dark:text-[#BDB0A8] max-w-lg leading-relaxed">
-            Consultá posibles interpretaciones desde la biodecodificación y descubrí ejercicios de PNL para acompañar tu proceso.
+          <p className="mt-1.5 text-sm sm:text-base text-[#3D3532] dark:text-[#E2D7D1] max-w-lg leading-relaxed">
+            Escribí lo que te pasa para conocer qué emoción puede estar detrás y descubrí ejercicios simples para aflojar tensiones.
           </p>
         </div>
 
@@ -86,9 +88,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             onSearch={onSearch}
             isLoading={isSearching}
             size="hero"
-            placeholder="Buscá una condición, síntoma o diagnóstico..."
+            placeholder="¿Qué molestia o dolor sentís hoy? (ej. dolor de cuello, acidez, insomnio)..."
           />
         </div>
+      </motion.section>
+
+      {/* Daily Reflection Feature Card */}
+      <motion.section variants={fadeInUpVariants}>
+        <DailyReflectionCard
+          onStartBreathing={() => {
+            const el = document.getElementById('breathing-section');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              const breathProtocol = featuredProtocols.find((p) => p.id === 'relajacion-478') || featuredProtocols[0];
+              if (breathProtocol) onOpenProtocol(breathProtocol);
+            }
+          }}
+        />
       </motion.section>
 
       {/* Últimas Búsquedas (Strict maximum of 5) */}
@@ -104,62 +121,51 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         />
       </motion.section>
 
-      {/* Contemplative Moment Card featuring the adapted artwork & frosted glass */}
-      <motion.section variants={fadeInUpVariants}>
-        <div className="relative bio-glass-card rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8">
-          {/* Framed Artwork Column with glowing pastel aura */}
-          <div className="relative w-full md:w-64 h-56 md:h-72 rounded-[24px] sm:rounded-[28px] overflow-hidden shrink-0 shadow-md group border border-white/80 dark:border-white/10">
-            <img
-              src={AppImages.inicioPortrait}
-              alt="Hacia el sol interior - Práctica de calma BioPNL"
-              className="w-full h-full object-cover object-[center_40%] group-hover:scale-105 transition-transform duration-700 ease-out"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
-            <div className="absolute bottom-3 left-3 right-3 text-white">
-              <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-white/25 backdrop-blur-md">
-                Enfoque del día
-              </span>
-              <p className="font-heading text-lg font-semibold leading-tight mt-1">
-                Presencia & Calma
+      {/* Semicircular Breathing Progress Chart & Calma Section */}
+      <motion.section id="breathing-section" variants={fadeInUpVariants}>
+        <div className="relative bio-glass-card rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            {/* Left: Description and Info */}
+            <div className="lg:col-span-6 space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8F3722]/10 dark:bg-[#E07853]/15 text-[#8F3722] dark:text-[#E07853] text-xs font-bold">
+                <Wind className="w-3.5 h-3.5" />
+                <span>Pausa Guiada en Vivo</span>
+              </div>
+
+              <h3 className="font-heading text-2xl sm:text-3xl font-semibold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight">
+                Hacé una pausa para respirar
+              </h3>
+
+              <p className="text-sm sm:text-base text-[#3D3532] dark:text-[#E2D7D1] leading-relaxed font-normal">
+                Seguí el ritmo del gráfico semicircular: inspirá para llenar tus pulmones, contené en calma y exhalá suavemente para aflojar tensiones.
               </p>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const breathProtocol = featuredProtocols.find((p) => p.id === 'relajacion-478') || featuredProtocols[0];
+                    if (breathProtocol) onOpenProtocol(breathProtocol);
+                  }}
+                  className="min-h-[42px] px-5 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:opacity-90 active:scale-98 transition-all cursor-pointer"
+                >
+                  <span>Ver pasos detallados</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onNavigateToProtocols}
+                  className="min-h-[42px] px-4 rounded-full bio-pill-capsule text-xs sm:text-sm font-bold text-[#111111] dark:text-[#FFF4ED] hover:border-[#8F3722]/50 transition-colors cursor-pointer"
+                >
+                  Otros ejercicios
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Description and Action Column */}
-          <div className="flex-1 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8F3722]/10 dark:bg-[#E07853]/15 text-[#8F3722] dark:text-[#E07853] text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Pausa contemplativa</span>
-            </div>
-
-            <h3 className="font-heading text-2xl sm:text-3xl font-semibold text-[#111111] dark:text-[#FFF4ED] tracking-tight">
-              Alineá tu respiración antes de explorar
-            </h3>
-
-            <p className="text-xs sm:text-sm text-[#333333] dark:text-[#BDB0A8] leading-relaxed max-w-xl font-normal">
-              Cuando el cuerpo experimenta un síntoma, la mente suele acelerarse buscando respuestas urgentes. Tomate unos minutos para bajar el ritmo cardíaco y abrir espacio a una comprensión más profunda y afectiva.
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const breathProtocol = featuredProtocols.find((p) => p.id === 'relajacion-478') || featuredProtocols[0];
-                  if (breathProtocol) onOpenProtocol(breathProtocol);
-                }}
-                className="min-h-[44px] px-6 rounded-full bg-[#181311] dark:bg-[#FAF0EA] text-white dark:text-[#181311] font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-md hover:opacity-90 active:scale-98 transition-all cursor-pointer"
-              >
-                <span>Iniciar Respiración 4-7-8</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={onNavigateToProtocols}
-                className="min-h-[44px] px-5 rounded-full bio-pill-capsule text-xs sm:text-sm font-bold text-[#111111] dark:text-[#FFF4ED] hover:border-[#8F3722]/50 transition-colors cursor-pointer"
-              >
-                Explorar todos los protocolos
-              </button>
+            {/* Right: Live Semicircular Breathing Progress Chart */}
+            <div className="lg:col-span-6 flex justify-center w-full">
+              <BreathingProgressChart initialTechniqueId="4-7-8" />
             </div>
           </div>
         </div>

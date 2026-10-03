@@ -11,19 +11,19 @@ interface SearchBarProps {
 }
 
 const QUICK_EXPLORATIONS = [
+  'Dolor de cuello',
+  'Acidez y estómago',
   'Ansiedad',
   'Migraña',
-  'Insomnio',
   'Dolor lumbar',
-  'Estrés',
-  'Problemas digestivos'
+  'Insomnio'
 ];
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   isLoading = false,
   initialQuery = '',
-  placeholder = 'Buscá una condición, síntoma o diagnóstico...',
+  placeholder = '¿Qué molestia o dolor sentís hoy? (ej. dolor de cuello, acidez, insomnio)...',
   autoFocus = false,
   size = 'hero'
 }) => {
@@ -34,7 +34,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     if (e) e.preventDefault();
     const trimmed = query.trim();
     if (!trimmed) {
-      setError('Por favor escribí un síntoma, condición o concepto.');
+      setError('Por favor escribí qué molestia o dolor sentís.');
       return;
     }
     setError(null);

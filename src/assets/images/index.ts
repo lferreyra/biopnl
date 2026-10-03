@@ -7,6 +7,9 @@ import innerPresenceBanner from './lumina_inner_presence_banner_1790534408170.jp
 import innerPresenceCard from './lumina_inner_presence_card_1790534397513.jpg';
 import mindfulPortal from './lumina_mindful_portal_1790527316457.jpg';
 import organicWaves from './lumina_organic_waves_1790527326570.jpg';
+import carouselPathBg from './carousel_path_bg_1791048404536.jpg';
+import portalArchDark from './portal_arch_bg_1791048765289.jpg';
+import portalArchLight from './portal_arch_light_1791048782017.jpg';
 
 export const AppImages = {
   ambientGlow,
@@ -15,7 +18,10 @@ export const AppImages = {
   innerPresenceBanner,
   innerPresenceCard,
   mindfulPortal,
-  organicWaves
+  organicWaves,
+  carouselPathBg,
+  portalArchDark,
+  portalArchLight
 };
 
 export default AppImages;

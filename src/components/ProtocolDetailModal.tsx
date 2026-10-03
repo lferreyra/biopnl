@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Protocol } from '../types';
 import { renderProtocolIcon } from './ProtocolCard';
-import { X, Clock, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, Play, Pause, RotateCcw } from 'lucide-react';
+import { X, Clock, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, Play, Pause, RotateCcw, Wind } from 'lucide-react';
 import { premiumEase } from '../utils/motionPresets';
 import { AppImages } from '../assets/images';
+import { BreathingProgressChart } from './BreathingProgressChart';
 
 interface ProtocolDetailModalProps {
   protocol: Protocol | null;
@@ -139,6 +140,24 @@ export const ProtocolDetailModal: React.FC<ProtocolDetailModalProps> = ({
 
         {/* Scrollable body content */}
         <div className="p-5 sm:p-7 overflow-y-auto space-y-6 text-[#111111] dark:text-[#FFF4ED]">
+          {/* Dedicated Semicircular Breathing Progress Chart if breathing protocol */}
+          {(protocol.iconName === 'Wind' || protocol.id.includes('478') || protocol.title.toLowerCase().includes('respiración')) && (
+            <div className="space-y-2 pb-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#8F3722] dark:text-[#E8B8A6] flex items-center gap-1.5">
+                  <Wind className="w-4 h-4 text-[#8F3722] dark:text-[#E07853]" />
+                  <span>Gráfico de Respiración en Vivo</span>
+                </h4>
+                <span className="text-[11px] text-[#3D3532] dark:text-[#E2D7D1]">
+                  Inspirar · Contener · Exhalar
+                </span>
+              </div>
+              <BreathingProgressChart
+                initialTechniqueId={protocol.id.includes('478') ? '4-7-8' : 'cuadrada'}
+              />
+            </div>
+          )}
+
           {/* Preparation card */}
           <div className="lumina-glass-warm rounded-2xl p-4 border border-[#E8B8A6]/40 dark:border-[#E8B8A6]/15">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#8F3722] dark:text-[#E8B8A6] mb-1">

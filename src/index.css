@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --font-heading: 'Urbanist', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-sans: 'Urbanist', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-brand: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
     
     --color-canvas: #FAF3EE;
@@ -14,8 +14,8 @@
     --color-terracotta: #C95832;
     --color-coral: #E06734;
     --color-rust: #8F3722;
-    --color-dark: #111111; /* Modo claro: letras negras profundas */
-    --color-muted: #374151; /* Modo claro: gris oscuro de alta legibilidad */
+    --color-dark: #1A1412; /* Modo claro: carbón oscuro con calidez natural */
+    --color-muted: #3D3532; /* Modo claro: excelente contraste WCAG AAA para párrafos */
   }
 
   .dark {
@@ -25,31 +25,37 @@
     --color-terracotta: #E07853;
     --color-coral: #F47A45;
     --color-rust: #BD5339;
-    --color-dark: #FFF4ED;
-    --color-muted: #BDB0A8;
+    --color-dark: #FFF7F2;
+    --color-muted: #E2D7D1; /* Modo oscuro: texto de párrafo nítido y claro */
   }
 
   body {
     font-family: var(--font-sans);
-    color: #111111;
+    color: #1A1412;
     -webkit-tap-highlight-color: transparent;
     transition: color 0.3s ease;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+    line-height: 1.55;
     min-height: 100vh;
   }
 
   .dark body {
-    color: #FFF4ED;
+    color: #FFF7F2;
+  }
+
+  p {
+    font-family: var(--font-sans);
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, .font-heading, .font-display {
     font-family: var(--font-heading);
-    letter-spacing: -0.025em;
-    color: #111111;
+    letter-spacing: -0.02em;
+    color: #1A1412;
   }
 
   .dark h1, .dark h2, .dark h3, .dark h4, .dark .font-heading, .dark .font-display {
-    color: #FFF4ED;
+    color: #FFF7F2;
   }
 }
 

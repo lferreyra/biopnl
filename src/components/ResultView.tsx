@@ -142,28 +142,20 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
         <div className="relative z-10">
           <div className="flex flex-wrap items-center gap-2 text-xs text-[#8F3722] dark:text-[#E07853] font-bold uppercase tracking-wider mb-2">
-            <span>Resultado de tu búsqueda</span>
-            {result.isDemoContent && (
-              <>
-                <span>·</span>
-                <span className="text-[#374151] dark:text-[#BDB0A8] lowercase font-medium">
-                  (contenido curado para demostración)
-                </span>
-              </>
-            )}
+            <span>Guía de bienestar</span>
           </div>
 
-          <h1 className="font-heading text-3xl sm:text-5xl font-bold text-[#111111] dark:text-[#FFF4ED] tracking-tight mb-4">
+          <h1 className="font-heading text-3xl sm:text-5xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight mb-4">
             {result.title}
           </h1>
 
           {/* Resumen Box */}
-          <div className="bio-glass-card rounded-[24px] p-5 border border-white/90 dark:border-white/10">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#8F3722] dark:text-[#E8B8A6] mb-1.5 flex items-center gap-1.5">
+          <div className="bio-glass-card rounded-[24px] p-5 sm:p-6 border border-white/90 dark:border-white/10">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#8F3722] dark:text-[#E8B8A6] mb-2 flex items-center gap-1.5">
               <BookmarkCheck className="w-4 h-4 text-[#8F3722] dark:text-[#E07853]" />
-              Resumen
+              Resumen en pocas palabras
             </h2>
-            <p className="text-sm sm:text-base text-[#111111] dark:text-[#FFF4ED] leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-[#1A1412] dark:text-[#FFF7F2] leading-relaxed font-normal">
               {result.summary}
             </p>
           </div>
@@ -177,14 +169,14 @@ export const ResultView: React.FC<ResultViewProps> = ({
       >
         <div className="flex items-center gap-2 text-[#8F3722] dark:text-[#E07853] font-bold text-xs uppercase tracking-wider">
           <Sparkles className="w-4 h-4" />
-          <span>Interpretación según la fuente</span>
+          <span>El significado de lo que sentís</span>
         </div>
 
-        <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] tracking-tight">
-          Perspectiva desde la biodecodificación
+        <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight">
+          ¿Qué emoción puede estar detrás de este síntoma?
         </h3>
 
-        <div className="text-sm sm:text-base text-[#222222] dark:text-[#FFF4ED] leading-relaxed space-y-3 pt-1 font-normal">
+        <div className="text-sm sm:text-base text-[#2E2420] dark:text-[#EAE0D9] leading-relaxed space-y-3 pt-1 font-normal">
           <p>{result.interpretation}</p>
         </div>
       </motion.div>
@@ -197,18 +189,18 @@ export const ResultView: React.FC<ResultViewProps> = ({
         >
           <div className="flex items-center gap-2 text-[#8F3722] dark:text-[#E07853] font-bold text-xs uppercase tracking-wider">
             <Layers className="w-4 h-4" />
-            <span>Temas para reflexionar</span>
+            <span>Factores clave</span>
           </div>
 
-          <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] tracking-tight">
-            Nodos emocionales asociados
+          <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight">
+            Emociones y situaciones asociadas
           </h3>
 
           <div className="flex flex-wrap gap-2.5 pt-1">
             {result.emotionalThemes.map((theme, index) => (
               <div
                 key={index}
-                className="px-4 py-2 rounded-full bio-pill-capsule text-[#111111] dark:text-[#FFF4ED] text-xs sm:text-sm font-bold shadow-2xs hover:border-[#8F3722]/50 transition-colors"
+                className="px-4 py-2 rounded-full bio-pill-capsule text-[#1A1412] dark:text-[#FFF7F2] text-xs sm:text-sm font-semibold shadow-2xs hover:border-[#8F3722]/50 transition-colors"
               >
                 {theme}
               </div>
@@ -240,12 +232,12 @@ export const ResultView: React.FC<ResultViewProps> = ({
             </button>
           </div>
 
-          <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] tracking-tight">
-            Preguntas de autoindagación
+          <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#1A1412] dark:text-[#FFF7F2] tracking-tight">
+            Preguntas para reflexionar con calma
           </h3>
 
-          <p className="text-xs sm:text-sm text-[#262626] dark:text-[#BDB0A8] font-medium">
-            Tomate un instante de silencio para resonar con estas interrogantes sin buscar respuestas inmediatas:
+          <p className="text-sm text-[#3D3532] dark:text-[#E2D7D1] font-normal leading-relaxed">
+            Tomate un momento tranquilo para leer estas preguntas y pensar cómo resuenan con lo que estás viviendo hoy:
           </p>
 
           {/* Contemplative inner listening guidance callout with artwork */}
@@ -257,11 +249,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
                 className="w-full h-full object-cover object-[center_25%]"
               />
             </div>
-            <div className="text-xs sm:text-sm text-[#262626] dark:text-[#BDB0A8] leading-relaxed">
+            <div className="text-xs sm:text-sm text-[#3D3532] dark:text-[#E2D7D1] leading-relaxed">
               <span className="font-bold text-[#8F3722] dark:text-[#E07853] text-xs block mb-0.5 uppercase tracking-wider">
-                Sugerencia de indagación
+                Consejo simple
               </span>
-              Cerrá los ojos unos instantes y permití que estas preguntas se asienten en tu respiración y cuerpo, sin forzar una explicación racional inmediata.
+              Hacé un par de respiraciones profundas. No hace falta responder todo de inmediato: permitite conectar con lo que sentís en el cuerpo.
             </div>
           </div>
 
@@ -274,7 +266,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                 <span className="font-heading text-base font-bold text-[#8F3722] dark:text-[#E07853] shrink-0 mt-0.5">
                   0{index + 1}.
                 </span>
-                <p className="text-sm sm:text-base text-[#111111] dark:text-[#FFF4ED] leading-relaxed font-normal">
+                <p className="text-sm sm:text-base text-[#1A1412] dark:text-[#FFF7F2] leading-relaxed font-normal">
                   "{question}"
                 </p>
               </div>
@@ -290,13 +282,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
             <div>
               <div className="flex items-center gap-2 text-[#8F3722] dark:text-[#E07853] font-bold text-xs uppercase tracking-wider">
                 <Sparkles className="w-4 h-4" />
-                <span>Protocolos sugeridos según el síntoma</span>
+                <span>Ejercicios recomendados</span>
               </div>
-              <h3 className="font-serif text-2xl font-bold text-[#111111] dark:text-[#FFF4ED] mt-0.5">
-                Ejercicios para acompañar tu proceso
+              <h3 className="font-heading text-2xl font-bold text-[#1A1412] dark:text-[#FFF7F2] mt-0.5">
+                Prácticas guiadas para aliviar tensiones
               </h3>
-              <p className="text-xs sm:text-sm text-[#333333] dark:text-[#BDB0A8] mt-1 font-normal">
-                Prácticas seleccionadas para regular el sistema nervioso, reencuadrar el significado de la tensión y calmar el cuerpo.
+              <p className="text-sm text-[#3D3532] dark:text-[#E2D7D1] mt-1 font-normal leading-relaxed">
+                Ejercicios simples de respiración y cambio de mirada para aflojar el cuerpo y recuperar tu serenidad.
               </p>
             </div>
           </div>

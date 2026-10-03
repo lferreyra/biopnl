@@ -20,6 +20,7 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { AdminService } from './services/adminService';
 import { ResultView } from './components/ResultView';
 import { ProtocolDetailModal } from './components/ProtocolDetailModal';
+import { AmbientSoundBar } from './components/AmbientSoundBar';
 import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
 
@@ -207,6 +208,9 @@ export default function App() {
           )}
         </>
       )}
+
+      {/* Floating Ambient Background Sound Controller */}
+      <AmbientSoundBar />
     </AppShell>
   );
 }
