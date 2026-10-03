@@ -64,7 +64,12 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
     try {
       let user: UserProfile;
       if (isSignUp) {
-        user = await AuthService.signUp(email, password, name);
+        if (!name.trim()) {
+          setAuthError("Por favor ingresá tu nombre y apellido completos.");
+          setIsLoading(false);
+          return;
+        }
+        user = await AuthService.signUp(email, password, name.trim());
       } else {
         user = await AuthService.signInWithEmail(email, password);
       }
@@ -499,7 +504,7 @@ export const LandingCarouselPage: React.FC<LandingCarouselPageProps> = ({
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Tu nombre"
+                            placeholder="Nombre y apellido completos"
                             className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-[#8F3722] dark:focus:ring-[#F47A45] text-[#1A1412] dark:text-white placeholder:text-[#3D3532]/50 dark:placeholder:text-white/40"
                           />
                         </div>
