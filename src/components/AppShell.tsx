@@ -114,20 +114,11 @@ export const AppShell: React.FC<AppShellProps> = ({
           <div className="bio-glass-card rounded-2xl p-3.5 border border-[#E8B8A6]/40 dark:border-white/10 text-xs shadow-2xs">
             <div className="flex items-center gap-1.5 text-[#8F3722] dark:text-[#E07853] font-bold mb-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Base de Conocimiento</span>
+              <span>Base de Sabiduría</span>
             </div>
-            <p className="text-[11px] text-[#262626] dark:text-[#BDB0A8] leading-tight font-medium">
-              Biodecodificación & PNL
+            <p className="text-xs text-[#262626] dark:text-[#BDB0A8] leading-normal font-medium">
+              Biodecodificación somática & Programación Neurolingüística (PNL)
             </p>
-            <a
-              href="https://notebook.google.com/notebook/1c497e40-f819-4347-bb5e-26dc73b75ed8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] text-[#8F3722] dark:text-[#E07853] hover:underline font-semibold mt-1.5"
-            >
-              <span>Ver fuentes</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
           </div>
 
           {/* User pill & sign out */}

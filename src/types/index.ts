@@ -80,6 +80,7 @@ export interface UserProfile {
   searchesCount?: number;
   protocolsCount?: number;
   status?: 'active' | 'inactive';
+  showAnxietySos?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark';

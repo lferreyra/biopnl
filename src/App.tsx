@@ -20,7 +20,10 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { AdminService } from './services/adminService';
 import { ResultView } from './components/ResultView';
 import { ProtocolDetailModal } from './components/ProtocolDetailModal';
-import { AmbientSoundBar } from './components/AmbientSoundBar';
+import { OfflineIndicatorBanner } from './components/OfflineIndicatorBanner';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
+import { SomaticSOSModal } from './components/SomaticSOSModal';
+import { MindfulNotificationsModal } from './components/MindfulNotificationsModal';
 import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
 
@@ -37,6 +40,33 @@ export default function App() {
 
   // Selected protocol modal state
   const [activeProtocol, setActiveProtocol] = useState<Protocol | null>(null);
+
+  // Somatic SOS 60s emergency modal state
+  const [isSOSOpen, setIsSOSOpen] = useState(false);
+
+  // Profile-based SOS setting
+  const [profileSosEnabled, setProfileSosEnabled] = useState(() => {
+    return localStorage.getItem('biopnl_show_sos_button') === 'true' || Boolean(user?.showAnxietySos);
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setProfileSosEnabled(localStorage.getItem('biopnl_show_sos_button') === 'true' || Boolean(user?.showAnxietySos));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [user]);
+
+  const hasAnxietySymptom =
+    lastQuery.toLowerCase().includes('ansiedad') ||
+    lastQuery.toLowerCase().includes('panico') ||
+    lastQuery.toLowerCase().includes('angustia') ||
+    (activeResult?.title?.toLowerCase().includes('ansiedad') ?? false);
+
+  const shouldShowSos = profileSosEnabled || hasAnxietySymptom;
+
+  // Mindful conscious notifications modal state
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Sync auth state
   useEffect(() => {
@@ -138,6 +168,12 @@ export default function App() {
       user={user}
       onSignOut={handleSignOut}
     >
+      {/* Offline Status Reassurance Banner */}
+      <OfflineIndicatorBanner />
+
+      {/* PWA In-App Install Prompt Banner */}
+      <PWAInstallBanner />
+
       {/* Protocol Detail Modal */}
       <ProtocolDetailModal
         protocol={activeProtocol}
@@ -209,8 +245,32 @@ export default function App() {
         </>
       )}
 
-      {/* Floating Ambient Background Sound Controller */}
-      <AmbientSoundBar />
+      {/* Floating Anxiety SOS 60s Button (Only visible if enabled in profile or when exploring anxiety symptoms) */}
+      {shouldShowSos && (
+        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => setIsSOSOpen(true)}
+            className="min-h-[50px] px-5 rounded-full bg-[#8F3722] hover:bg-[#7A2818] active:scale-95 text-white shadow-xl flex items-center gap-2.5 text-sm font-bold transition-all cursor-pointer group"
+            title="Iniciar reseteo de calma inmediata en 60 segundos"
+          >
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FAF3EE] opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FAF3EE]" />
+            </span>
+            <span>🆘 Reseteo SOS 60s</span>
+          </button>
+        </div>
+      )}
+
+      {/* Somatic SOS Modal */}
+      <SomaticSOSModal isOpen={isSOSOpen} onClose={() => setIsSOSOpen(false)} />
+
+      {/* Mindful Notifications Modal */}
+      <MindfulNotificationsModal
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+      />
     </AppShell>
   );
 }

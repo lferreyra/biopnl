@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { UserProfile } from '../types';
 import { UserAvatar } from '../components/UserAvatar';
 import { Disclaimer } from '../components/Disclaimer';
 import { useTheme } from '../context/ThemeContext';
-import { LogOut, Calendar, Mail, Database, BookOpen, ExternalLink, Moon, Sun, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
+import { LogOut, Calendar, Mail, Database, BookOpen, Moon, Sun, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 
 interface ProfilePageProps {
@@ -22,6 +22,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const isAdmin = user.role === 'admin' || user.email.toLowerCase() === 'lucas.ferreyra@gmail.com';
+  const [sosEnabled, setSosEnabled] = useState(() => localStorage.getItem('biopnl_show_sos_button') === 'true');
 
   const memberSince = new Date(user.createdAt).toLocaleDateString('es-ES', {
     month: 'long',
@@ -175,24 +176,55 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         </div>
 
-        {/* NotebookLM info */}
-        <div className="bio-glass-card rounded-2xl p-4 border border-[#E8B8A6]/30 dark:border-[#E8B8A6]/10 text-xs space-y-1.5">
-          <div className="flex items-center gap-1.5 text-[#8F3722] dark:text-[#E07853] font-bold uppercase tracking-wider text-[11px]">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Biblioteca de referencia activa</span>
+        {/* Anxiety SOS Setting (Configurable per user) */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-white/5 border border-[#E8B8A6]/40 dark:border-white/10 space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-[#8F3722] dark:text-[#E07853] uppercase tracking-wider block">
+                Acompañamiento en momentos de ansiedad
+              </span>
+              <h3 className="text-sm sm:text-base font-bold text-[#111111] dark:text-[#FFF4ED]">
+                ¿Tenés tendencia a la ansiedad o sobrecarga emocional?
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4B5563] dark:text-[#BDB0A8] leading-relaxed">
+                Activá esta opción si deseás tener a mano el botón flotante de reseteo rápido en 60 segundos ("Doble Suspiro Fisiológico") para momentos de pánico o estrés intenso.
+              </p>
+            </div>
+
+            {/* Big toggle button */}
+            <button
+              type="button"
+              onClick={() => {
+                const nextVal = !(localStorage.getItem('biopnl_show_sos_button') === 'true');
+                localStorage.setItem('biopnl_show_sos_button', nextVal ? 'true' : 'false');
+                window.dispatchEvent(new Event('storage'));
+                // Force component re-render
+                setSosEnabled(nextVal);
+              }}
+              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                sosEnabled ? 'bg-[#8F3722] dark:bg-[#E07853]' : 'bg-black/20 dark:bg-white/20'
+              }`}
+              role="switch"
+              aria-checked={sosEnabled}
+            >
+              <span
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                  sosEnabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
           </div>
-          <p className="text-[#111111] dark:text-[#FFF4ED]/80 font-normal">
-            Tus consultas se procesan a través de la arquitectura de la biblioteca de biodecodificación y PNL.
+        </div>
+
+        {/* Source citation info */}
+        <div className="bio-glass-card rounded-2xl p-4 border border-[#E8B8A6]/30 dark:border-[#E8B8A6]/10 text-xs sm:text-sm space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[#8F3722] dark:text-[#E07853] font-bold uppercase tracking-wider text-xs">
+            <BookOpen className="w-4 h-4" />
+            <span>Fundamentos de Biodecodificación & PNL</span>
+          </div>
+          <p className="text-[#111111] dark:text-[#FFF4ED]/80 font-normal leading-relaxed">
+            Las lecturas se basan en literatura consolidada de biodecodificación biológica y programación neurolingüística para el autoconocimiento y la serenidad física.
           </p>
-          <a
-            href="https://notebook.google.com/notebook/1c497e40-f819-4347-bb5e-26dc73b75ed8"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[11px] text-[#8F3722] dark:text-[#E07853] font-bold hover:underline pt-1"
-          >
-            <span>Explorar cuaderno de NotebookLM</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
         </div>
 
         {/* Sign Out Button */}

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DailyReflection, getTodayReflection, DAILY_REFLECTIONS } from '../data/dailyReflections';
-import { ambientAudio, SOUNDTRACKS } from '../services/ambientAudioService';
-import { Sparkles, RefreshCw, PenLine, Check, Heart, Wind, Copy, Music, Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { Sparkles, RefreshCw, PenLine, Check, Heart, Wind, Copy } from 'lucide-react';
 
 interface DailyReflectionCardProps {
   onStartBreathing?: () => void;
@@ -21,14 +20,6 @@ export const DailyReflectionCard: React.FC<DailyReflectionCardProps> = ({ onStar
   const [userNote, setUserNote] = useState('');
   const [isSaved, setIsSaved] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  // Ambient sound integration
-  const [audioState, setAudioState] = useState(() => ambientAudio.getState());
-  useEffect(() => {
-    return ambientAudio.subscribe(() => {
-      setAudioState(ambientAudio.getState());
-    });
-  }, []);
 
   const todayDateKey = new Date().toISOString().split('T')[0];
   const storageKey = `biopnl_reflection_note_${todayDateKey}_${reflection.id}`;
@@ -91,34 +82,6 @@ export const DailyReflectionCard: React.FC<DailyReflectionCardProps> = ({ onStar
         </div>
 
         <div className="flex items-center gap-1.5">
-          {/* Ambient Music Button */}
-          <button
-            type="button"
-            onClick={() => ambientAudio.toggle('meditacion')}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-              audioState.isPlaying
-                ? 'bg-[#8F3722] text-white border-[#8F3722] shadow-2xs'
-                : 'bg-white/80 dark:bg-white/10 text-[#3D3532] dark:text-[#E2D7D1] border-[#E8B8A6]/40 hover:border-[#8F3722]'
-            }`}
-            title="Reproducir música suave para reflexionar"
-          >
-            {audioState.isPlaying ? (
-              <>
-                <Pause className="w-3 h-3 fill-white" />
-                <span className="hidden sm:inline">Música activa</span>
-                <span className="flex items-end gap-0.5 h-2.5">
-                  <span className="w-0.5 h-2 bg-white rounded-full animate-pulse" />
-                  <span className="w-0.5 h-2.5 bg-white rounded-full animate-pulse delay-75" />
-                </span>
-              </>
-            ) : (
-              <>
-                <Music className="w-3 h-3 text-[#8F3722] dark:text-[#E07853]" />
-                <span>Música suave</span>
-              </>
-            )}
-          </button>
-
           <button
             onClick={handleCopy}
             className="p-1.5 rounded-lg text-[#3D3532] dark:text-[#E2D7D1] hover:text-[#8F3722] dark:hover:text-[#E07853] hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"

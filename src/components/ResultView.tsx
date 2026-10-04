@@ -4,6 +4,7 @@ import { KnowledgeResult, Protocol } from '../types';
 import { ProtocolCard } from './ProtocolCard';
 import { Disclaimer } from './Disclaimer';
 import { generateResultPdf } from '../utils/pdfExport';
+import { SocialShareCardModal } from './SocialShareCardModal';
 import {
   Sparkles,
   BookOpen,
@@ -15,7 +16,8 @@ import {
   BookmarkCheck,
   FileDown,
   Loader2,
-  Check
+  Check,
+  Share2
 } from 'lucide-react';
 import { fadeInUpVariants, staggerContainerVariants } from '../utils/motionPresets';
 import { AppImages } from '../assets/images';
@@ -35,6 +37,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
 }) => {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [pdfDownloaded, setPdfDownloaded] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleDownloadPdf = async () => {
     if (isGeneratingPdf) return;
@@ -97,6 +100,16 @@ export const ResultView: React.FC<ResultViewProps> = ({
             )}
           </button>
 
+          {/* Social Share Card Button */}
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold border border-[#E8B8A6]/70 dark:border-white/15 bg-white dark:bg-[#221712] text-[#111111] dark:text-[#FFF4ED] hover:text-[#8F3722] hover:border-[#8F3722]/60 hover:shadow-xs transition-all cursor-pointer shadow-2xs"
+            title="Compartir tarjeta de síntoma en WhatsApp o redes"
+          >
+            <Share2 className="w-3.5 h-3.5 text-[#8F3722] dark:text-[#E07853]" />
+            <span>Compartir Cápsula</span>
+          </button>
+
           <button
             onClick={onNewSearch}
             className="text-xs sm:text-sm text-[#8F3722] dark:text-[#E07853] hover:underline font-bold cursor-pointer"
@@ -105,6 +118,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
           </button>
         </div>
       </motion.div>
+
+      {/* Social Share Card Modal */}
+      <SocialShareCardModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        result={result}
+      />
 
       {/* Emergency or Warning Alert if triggered */}
       {result.medicalAlert && result.medicalAlert.isAlert && (
@@ -177,7 +197,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
         </h3>
 
         <div className="text-sm sm:text-base text-[#2E2420] dark:text-[#EAE0D9] leading-relaxed space-y-3 pt-1 font-normal">
-          <p>{result.interpretation}</p>
+          {result.interpretation.split('\n\n').map((paragraph, idx) => (
+            <p key={idx} className="leading-relaxed">
+              {paragraph}
+            </p>
+          ))}
         </div>
       </motion.div>
 
@@ -321,20 +345,9 @@ export const ResultView: React.FC<ResultViewProps> = ({
               <p className="font-bold text-[#111111] dark:text-[#FFF4ED]">{src.name}</p>
               <p className="text-xs text-[#374151] dark:text-[#BDB0A8] font-medium">{src.reference}</p>
               {src.relevantExcerpt && (
-                <p className="text-xs italic text-[#262626] dark:text-[#BDB0A8]/90 pt-1 font-normal">
+                <p className="text-xs sm:text-sm italic text-[#262626] dark:text-[#BDB0A8]/90 pt-1 font-normal">
                   "{src.relevantExcerpt}"
                 </p>
-              )}
-              {src.url && (
-                <a
-                  href={src.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] text-[#8F3722] dark:text-[#E07853] hover:underline pt-1 font-bold"
-                >
-                  <span>Ver cuaderno fuente en NotebookLM</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
               )}
             </div>
           ))}

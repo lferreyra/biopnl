@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#8F3722"/>
+  <!-- Calming Arch Motif in Terracotta & Cream -->
+  <path d="M 96 384 A 160 160 0 0 1 416 384" fill="none" stroke="#FAF3EE" stroke-width="40" stroke-linecap="round"/>
+  <!-- Inner Radiance Sun / Portal -->
+  <circle cx="256" cy="270" r="54" fill="#FAF3EE"/>
+  <!-- Grounding Horizontal Baseline -->
+  <line x1="80" y1="416" x2="432" y2="416" stroke="#FAF3EE" stroke-width="20" stroke-linecap="round" opacity="0.6"/>
+</svg>

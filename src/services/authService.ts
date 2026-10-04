@@ -121,6 +121,22 @@ export class AuthService {
     this.listeners.forEach((l) => l(this.currentUser));
   }
 
+  static async updateUserPreferences(partial: Partial<UserProfile>): Promise<UserProfile | null> {
+    if (!this.currentUser) return null;
+    const updated = { ...this.currentUser, ...partial };
+    this.currentUser = updated;
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+    if (db && auth?.currentUser) {
+      try {
+        await updateDoc(doc(db, 'users', auth.currentUser.uid), partial);
+      } catch (err) {
+        console.warn('Non-fatal preference sync notice:', err);
+      }
+    }
+    this.notify();
+    return updated;
+  }
+
   private static mapAuthError(err: unknown): string {
     if (!err || typeof err !== 'object') return 'Ocurrió un error inesperado al procesar la solicitud.';
     const code = (err as { code?: string }).code || '';

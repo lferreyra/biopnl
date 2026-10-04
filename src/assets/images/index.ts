@@ -10,6 +10,8 @@ import organicWaves from './lumina_organic_waves_1790527326570.jpg';
 import carouselPathBg from './carousel_path_bg_1791048404536.jpg';
 import portalArchDark from './portal_arch_bg_1791048765289.jpg';
 import portalArchLight from './portal_arch_light_1791048782017.jpg';
+import humanBodyMeshDark from './human_body_mesh_1791128772835.jpg';
+import humanBodyMeshLight from './human_body_light_1791128785674.jpg';
 
 export const AppImages = {
   ambientGlow,
@@ -21,7 +23,9 @@ export const AppImages = {
   organicWaves,
   carouselPathBg,
   portalArchDark,
-  portalArchLight
+  portalArchLight,
+  humanBodyMeshDark,
+  humanBodyMeshLight
 };
 
 export default AppImages;

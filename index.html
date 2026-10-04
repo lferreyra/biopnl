@@ -8,10 +8,22 @@
     <meta property="og:title" content="BioPNL | Biodecodificación & PNL Consciente" />
     <meta property="og:description" content="BioPNL - Espacio de claridad, bienestar y reflexión personal basado en biodecodificación y protocolos de PNL." />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#2A211E" />
+    <meta name="theme-color" content="#8F3722" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            console.log('SW registration note:', err);
+          });
+        });
+      }
+    </script>
   </head>
   <body class="bg-[#FFF9F5] text-[#2A211E] antialiased selection:bg-[#E8B8A6]/40 selection:text-[#2A211E]">
     <div id="root"></div>
