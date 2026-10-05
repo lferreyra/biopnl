@@ -1,9 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="128" fill="#8F3722"/>
-  <!-- Calming Arch Motif in Terracotta & Cream -->
-  <path d="M 96 384 A 160 160 0 0 1 416 384" fill="none" stroke="#FAF3EE" stroke-width="40" stroke-linecap="round"/>
-  <!-- Inner Radiance Sun / Portal -->
-  <circle cx="256" cy="270" r="54" fill="#FAF3EE"/>
-  <!-- Grounding Horizontal Baseline -->
-  <line x1="80" y1="416" x2="432" y2="416" stroke="#FAF3EE" stroke-width="20" stroke-linecap="round" opacity="0.6"/>
+  <defs>
+    <linearGradient id="biopnlCircleIcon" x1="256" y1="20" x2="256" y2="492" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#E26A40"/>
+      <stop offset="100%" stopColor="#D45A2F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Official Circular Emblem (BioPNL App Shortcut Icon) -->
+  <circle cx="256" cy="256" r="236" fill="url(#biopnlCircleIcon)"/>
+
+  <!-- Segment 1: Upper Central Kernel -->
+  <path
+    d="M 225 72 C 256 72 271 97 271 133 C 271 195 266 266 256 323 C 251 353 230 369 205 364 C 179 358 164 328 164 276 C 164 205 174 133 195 92 C 205 77 215 72 225 72 Z"
+    fill="#FBECE3"
+  />
+
+  <!-- Segment 2: Lower-Left Wrap Lobe -->
+  <path
+    d="M 92 215 C 123 230 143 266 154 317 C 159 358 190 389 220 399 C 195 425 159 430 123 415 C 87 389 67 343 67 297 C 67 261 77 230 92 215 Z"
+    fill="#FBECE3"
+  />
+
+  <!-- Segment 3: Right Crescent Lobe -->
+  <path
+    d="M 292 102 C 348 113 399 164 420 236 C 435 297 420 358 379 394 C 348 415 312 410 297 389 C 307 358 307 297 302 236 C 297 184 292 133 292 102 Z"
+    fill="#FBECE3"
+  />
 </svg>

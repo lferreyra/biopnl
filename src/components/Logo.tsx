@@ -1,19 +1,20 @@
 import React from 'react';
+import { BRAND_COLORS } from '../utils/brandLogo';
 
 interface LogoProps {
   className?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
   textColor?: string;
-  variant?: 'terracotta' | 'monochrome' | 'light';
+  variant?: 'auto' | 'light' | 'dark';
 }
 
 export const Logo: React.FC<LogoProps> = ({
   className = '',
   size = 'md',
   showText = true,
-  textColor = 'text-[#2A211E] dark:text-[#FFF4ED]',
-  variant = 'terracotta'
+  textColor,
+  variant = 'auto'
 }) => {
   const sizeMap = {
     xs: { icon: 'w-6 h-6', text: 'text-base', spacing: 'gap-1.5' },
@@ -25,82 +26,97 @@ export const Logo: React.FC<LogoProps> = ({
 
   const { icon, text, spacing } = sizeMap[size];
 
-  return (
-    <div className={`flex items-center ${spacing} select-none ${className}`}>
-      {/* Cellular Organic Membrane BioPNL Symbol */}
-      <div className={`relative ${icon} shrink-0 flex items-center justify-center`}>
-        {/* Subtle ambient halo */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#D96C45]/30 to-[#F47A45]/20 blur-[2px] opacity-70" />
+  // Default adaptive text color
+  const computedTextColor =
+    textColor ||
+    (variant === 'dark'
+      ? 'text-[#FFF7F2]'
+      : variant === 'light'
+      ? 'text-[#241915]'
+      : 'text-[#241915] dark:text-[#FFF7F2]');
 
+  return (
+    <div className={`inline-flex items-center ${spacing} select-none ${className}`}>
+      {/* Official BioPNL Circular Emblem (Authentic 3-Segment Design) */}
+      <div className={`relative ${icon} shrink-0 flex items-center justify-center`}>
         <svg
           viewBox="0 0 100 100"
-          className="w-full h-full relative z-10 transition-transform duration-300 hover:scale-105"
+          className="w-full h-full relative z-10 transition-transform duration-300 hover:scale-105 drop-shadow-xs"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <linearGradient id="biopnlGrad" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#F47A45" />
-              <stop offset="55%" stopColor="#D96C45" />
-              <stop offset="100%" stopColor="#A94A32" />
+            {/* Light mode gradient */}
+            <linearGradient id="biopnlEmblemLight" x1="50" y1="4" x2="50" y2="96" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor={BRAND_COLORS.circleLight} />
+              <stop offset="100%" stopColor={BRAND_COLORS.circleLightGradEnd} />
             </linearGradient>
-            <linearGradient id="biopnlLightGrad" x1="10" y1="10" x2="90" y2="90" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#FFF4ED" />
-              <stop offset="100%" stopColor="#F6E7DF" />
+
+            {/* Dark mode gradient */}
+            <linearGradient id="biopnlEmblemDark" x1="50" y1="4" x2="50" y2="96" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor={BRAND_COLORS.circleDark} />
+              <stop offset="100%" stopColor={BRAND_COLORS.circleDarkGradEnd} />
             </linearGradient>
           </defs>
 
-          {/* Organic Cellular Tri-lobe BioPNL Emblem matching user logo */}
+          {/* 1. Terracotta Circle Background */}
+          {variant === 'dark' ? (
+            <circle cx="50" cy="50" r="46" fill="url(#biopnlEmblemDark)" />
+          ) : variant === 'light' ? (
+            <circle cx="50" cy="50" r="46" fill="url(#biopnlEmblemLight)" />
+          ) : (
+            <>
+              <circle cx="50" cy="50" r="46" fill="url(#biopnlEmblemLight)" className="dark:hidden" />
+              <circle cx="50" cy="50" r="46" fill="url(#biopnlEmblemDark)" className="hidden dark:block" />
+            </>
+          )}
+
+          {/* 2. Segment 1: Upper Central Kernel */}
           <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="
-              M 50 4
-              A 46 46 0 1 1 49.99 4
-              Z
+            d="M 44 14 C 50 14 53 19 53 26 C 53 38 52 52 50 63 C 49 69 45 72 40 71 C 35 70 32 64 32 54 C 32 40 34 26 38 18 C 40 15 42 14 44 14 Z"
+            className={
+              variant === 'dark'
+                ? 'fill-[#FFF0E8]'
+                : variant === 'light'
+                ? 'fill-[#FBECE3]'
+                : 'fill-[#FBECE3] dark:fill-[#FFF0E8]'
+            }
+          />
 
-              M 48 10
-              C 54 11 58 17 62 26
-              C 67 36 67 49 69 61
-              C 70 69 66 74 61 74
-              C 54 74 46 68 38 60
-              C 29 51 23 41 23 33
-              C 23 23 30 14 39 11
-              C 42 10 45 10 48 10
-              Z
+          {/* 3. Segment 2: Lower-Left Wrap Lobe */}
+          <path
+            d="M 18 42 C 24 45 28 52 30 62 C 31 70 37 76 43 78 C 38 83 31 84 24 81 C 17 76 13 67 13 58 C 13 51 15 45 18 42 Z"
+            className={
+              variant === 'dark'
+                ? 'fill-[#FFF0E8]'
+                : variant === 'light'
+                ? 'fill-[#FBECE3]'
+                : 'fill-[#FBECE3] dark:fill-[#FFF0E8]'
+            }
+          />
 
-              M 67 15
-              C 74 21 78 30 81 41
-              C 84 53 84 64 79 73
-              C 76 78 73 80 70 78
-              C 67 76 68 70 68 62
-              C 68 50 67 36 64 25
-              C 63 20 64 16 67 15
-              Z
-
-              M 22 41
-              C 23 48 29 56 37 64
-              C 44 71 52 77 60 78
-              C 56 83 49 87 41 87
-              C 30 87 21 81 16 71
-              C 12 62 13 52 17 44
-              C 18 42 20 41 22 41
-              Z
-            "
-            fill={variant === 'light' ? 'url(#biopnlLightGrad)' : 'url(#biopnlGrad)'}
+          {/* 4. Segment 3: Right Crescent Lobe */}
+          <path
+            d="M 57 20 C 68 22 78 32 82 46 C 85 58 82 70 74 77 C 68 81 61 80 58 76 C 60 70 60 58 59 46 C 58 36 57 26 57 20 Z"
+            className={
+              variant === 'dark'
+                ? 'fill-[#FFF0E8]'
+                : variant === 'light'
+                ? 'fill-[#FBECE3]'
+                : 'fill-[#FBECE3] dark:fill-[#FFF0E8]'
+            }
           />
         </svg>
       </div>
 
+      {/* Official "biopnl" lowercase Wordmark */}
       {showText && (
-        <div className="flex flex-col leading-none">
-          <span
-            className={`font-['Comfortaa',sans-serif] font-bold tracking-[-0.04em] lowercase ${text} ${textColor}`}
-            style={{ fontFamily: "'Comfortaa', -apple-system, sans-serif" }}
-          >
-            biopnl
-          </span>
-        </div>
+        <span
+          className={`font-['Comfortaa',sans-serif] font-bold tracking-[-0.03em] lowercase ${text} ${computedTextColor}`}
+          style={{ fontFamily: "'Comfortaa', -apple-system, sans-serif" }}
+        >
+          biopnl
+        </span>
       )}
     </div>
   );

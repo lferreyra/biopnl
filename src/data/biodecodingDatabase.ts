@@ -1,4 +1,4 @@
-import { Source } from '../types';
+import type { Source } from '../types.ts';
 
 export interface BiodecodingEntry {
   aliases: string[];

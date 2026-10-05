@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { KnowledgeResult } from '../types';
+import { getBrandLogoDataUrl, drawEmblemOnCanvas } from './brandLogo';
 
 /**
  * Generates an elegant, minimalist A4 PDF containing the biological meaning,
@@ -24,22 +25,28 @@ export const generateResultPdf = async (result: KnowledgeResult): Promise<void> 
   const setCoral = () => doc.setTextColor(217, 108, 69); // #D96C45
   const setMuted = () => doc.setTextColor(92, 77, 70); // #5C4D46
 
-  // --- 1. Official BioPNL Header with Logo ---
-  // Draw Logo Symbol: Terracotta outer circle
-  doc.setFillColor(143, 55, 34); // #8F3722
-  doc.circle(margin + 4.5, y + 2, 4.5, 'F');
+  // --- 1. Official BioPNL Header with Brand Logo ---
+  try {
+    const logoDataUrl = getBrandLogoDataUrl(140, { showText: true, theme: 'light' });
+    if (logoDataUrl) {
+      // 36mm wide x 10mm high official logo emblem + wordmark
+      doc.addImage(logoDataUrl, 'PNG', margin, y - 3, 36, 10);
+    } else {
+      throw new Error('Canvas unavailable');
+    }
+  } catch (_e) {
+    // Fallback: Vector rendering of the circular emblem
+    doc.setFillColor(223, 104, 65); // #DF6841
+    doc.circle(margin + 5, y + 2, 5, 'F');
+    doc.setFillColor(251, 236, 227); // #FBECE3
+    doc.circle(margin + 3.8, y + 1.8, 2.2, 'F');
+    doc.circle(margin + 6.2, y + 2.0, 1.8, 'F');
 
-  // Inner organic membrane cutouts
-  doc.setFillColor(255, 249, 245); // #FFF9F5
-  doc.circle(margin + 3.2, y + 0.8, 1.8, 'F');
-  doc.circle(margin + 6.0, y + 1.2, 1.6, 'F');
-  doc.circle(margin + 4.5, y + 3.8, 1.8, 'F');
-
-  // Wordmark "biopnl"
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  setTerracotta();
-  doc.text('biopnl', margin + 11, y + 4);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(36, 27, 23); // #241B17
+    doc.text('biopnl', margin + 12, y + 4);
+  }
 
   // Link on the right (ALWAYS citing biopnl.vercel.app)
   doc.setFont('helvetica', 'bold');
@@ -180,16 +187,25 @@ export const generateResultPdf = async (result: KnowledgeResult): Promise<void> 
     doc.text(themesStr, margin, y);
   }
 
-  // --- 6. Official Footer with biopnl.vercel.app link ---
+  // --- 6. Official Footer with Brand Emblem & biopnl.vercel.app link ---
   const footerY = pageHeight - 12;
   doc.setDrawColor(232, 184, 166);
   doc.setLineWidth(0.4);
   doc.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
 
+  let linkX = margin;
+  try {
+    const emblemDataUrl = getBrandLogoDataUrl(80, { showText: false, theme: 'light' });
+    if (emblemDataUrl) {
+      doc.addImage(emblemDataUrl, 'PNG', margin, footerY - 3, 4.2, 4.2);
+      linkX = margin + 6;
+    }
+  } catch (_e) {}
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   setTerracotta();
-  doc.textWithLink('biopnl.vercel.app', margin, footerY, {
+  doc.textWithLink('biopnl.vercel.app', linkX, footerY, {
     url: 'https://biopnl.vercel.app'
   });
 
@@ -198,7 +214,7 @@ export const generateResultPdf = async (result: KnowledgeResult): Promise<void> 
   setMuted();
   doc.text(
     '· Biodecodificación & PNL Consciente · Guía orientativa para el bienestar y la serenidad física.',
-    margin + 26,
+    linkX + 26,
     footerY
   );
 

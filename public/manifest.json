@@ -10,9 +10,18 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#FAF3EE",
-  "theme_color": "#8F3722",
+  "background_color": "#FFF9F5",
+  "theme_color": "#DE673D",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "description": "Tu espacio de autoconocimiento, biodecodificación de síntomas físicos y protocolos de PNL para la calma somática."
+  "description": "Tu espacio de autoconocimiento, biodecodificación de síntomas físicos y protocolos de PNL para la calma somática.",
+  "shortcuts": [
+    {
+      "name": "Buscador de Síntomas",
+      "short_name": "Buscador",
+      "description": "Consultar sentido biológico de síntomas",
+      "url": "/?tab=search",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ]
 }

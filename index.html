@@ -8,13 +8,23 @@
     <meta property="og:title" content="BioPNL | Biodecodificación & PNL Consciente" />
     <meta property="og:description" content="BioPNL - Espacio de claridad, bienestar y reflexión personal basado en biodecodificación y protocolos de PNL." />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#8F3722" />
+    <meta name="theme-color" content="#DE673D" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
     <link rel="apple-touch-icon" href="/icons/icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      @keyframes biopnlPulse {
+        0%, 100% { transform: scale(1); opacity: 0.95; }
+        50% { transform: scale(1.06); opacity: 1; }
+      }
+      @keyframes biopnlBar {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+    </style>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -26,7 +36,24 @@
     </script>
   </head>
   <body class="bg-[#FFF9F5] text-[#2A211E] antialiased selection:bg-[#E8B8A6]/40 selection:text-[#2A211E]">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Official BioPNL Initial Brand Loading Screen -->
+      <div id="biopnl-initial-loader" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background-color:#FFF9F5;font-family:'Comfortaa',-apple-system,sans-serif;z-index:99999;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+          <!-- Official Circular Emblem (Authentic 3-Segment Design) -->
+          <svg viewBox="0 0 100 100" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:biopnlPulse 2.4s ease-in-out infinite;">
+            <circle cx="50" cy="50" r="46" fill="#E26A40"/>
+            <path d="M 44 14 C 50 14 53 19 53 26 C 53 38 52 52 50 63 C 49 69 45 72 40 71 C 35 70 32 64 32 54 C 32 40 34 26 38 18 C 40 15 42 14 44 14 Z" fill="#FBECE3"/>
+            <path d="M 18 42 C 24 45 28 52 30 62 C 31 70 37 76 43 78 C 38 83 31 84 24 81 C 17 76 13 67 13 58 C 13 51 15 45 18 42 Z" fill="#FBECE3"/>
+            <path d="M 57 20 C 68 22 78 32 82 46 C 85 58 82 70 74 77 C 68 81 61 80 58 76 C 60 70 60 58 59 46 C 58 36 57 26 57 20 Z" fill="#FBECE3"/>
+          </svg>
+          <span style="font-size:36px;font-weight:700;color:#241915;letter-spacing:-0.03em;">biopnl</span>
+        </div>
+        <div style="width:52px;height:3px;background:rgba(222,103,61,0.2);border-radius:3px;overflow:hidden;">
+          <div style="width:100%;height:100%;background:#DE673D;border-radius:3px;animation:biopnlBar 1.4s ease-in-out infinite;"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

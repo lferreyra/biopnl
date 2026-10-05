@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Share2, MessageCircle, Sparkles, ExternalLink, Globe } from 'lucide-react';
 import { KnowledgeResult } from '../types';
+import { drawFullBrandLogo } from '../utils/brandLogo';
+import { Logo } from './Logo';
 
 interface SocialShareCardModalProps {
   isOpen: boolean;
@@ -82,40 +84,6 @@ export const SocialShareCardModal: React.FC<SocialShareCardModalProps> = ({
     ctx.closePath();
   };
 
-  // Draw BioPNL Logo symbol
-  const drawBioPnlLogo = (ctx: CanvasRenderingContext2D, x: number, y: number, scale = 1) => {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(scale, scale);
-
-    // Outer circle with terracotta gradient
-    const grad = ctx.createLinearGradient(0, 0, 60, 60);
-    grad.addColorStop(0, '#F47A45');
-    grad.addColorStop(0.5, '#D96C45');
-    grad.addColorStop(1, '#8F3722');
-    ctx.fillStyle = grad;
-
-    ctx.beginPath();
-    ctx.arc(30, 30, 28, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Internal organic cellular membrane cutouts (creates BioPNL tri-lobe emblem)
-    ctx.fillStyle = '#FAF3EE';
-    ctx.beginPath();
-    ctx.arc(22, 22, 10, 0, Math.PI * 2);
-    ctx.arc(38, 24, 9, 0, Math.PI * 2);
-    ctx.arc(29, 39, 10, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Inner organic connectors
-    ctx.beginPath();
-    ctx.arc(30, 30, 6, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    ctx.restore();
-  };
-
   const handleDownloadPng = async () => {
     setIsExporting(true);
     try {
@@ -161,14 +129,8 @@ export const SocialShareCardModal: React.FC<SocialShareCardModalProps> = ({
       ctx.stroke();
       ctx.restore();
 
-      // 4. Logo Header at Top: [Emblem] + "biopnl" in 'Comfortaa'
-      drawBioPnlLogo(ctx, 420, 80, 0.85);
-
-      ctx.fillStyle = '#1A1412';
-      ctx.font = "bold 44px 'Comfortaa', -apple-system, sans-serif";
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('biopnl', 485, 105);
+      // 4. Logo Header at Top: Official BioPNL Brand Logo (Emblem + lowercase "biopnl")
+      drawFullBrandLogo(ctx, 430, 80, 50, { theme: 'light', showText: true });
 
       // Category Pill
       ctx.save();
@@ -396,12 +358,9 @@ export const SocialShareCardModal: React.FC<SocialShareCardModalProps> = ({
 
           {/* Visual Preview Card matching exported PNG */}
           <div className="relative rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-[#FFF9F5] via-[#FAF3EE] to-[#F5EAE2] dark:from-[#251B17] dark:via-[#1F1714] dark:to-[#251B17] border border-[#E8B8A6]/70 dark:border-white/15 shadow-lg text-center space-y-3.5 my-2">
-            {/* Top Logo & Arc Motif */}
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-6 border-t-4 border-l-4 border-r-4 border-[#8F3722]/40 rounded-t-full" />
-              <span className="font-['Comfortaa'] font-bold text-lg text-[#1A1412] dark:text-[#FFF7F2] lowercase">
-                biopnl
-              </span>
+            {/* Top Brand Logo */}
+            <div className="flex justify-center items-center py-1">
+              <Logo size="sm" />
             </div>
 
             <h4 className="font-heading text-xl sm:text-2xl font-bold text-[#1A1412] dark:text-[#FFF7F2] capitalize">
