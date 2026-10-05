@@ -1,5 +1,6 @@
 import { KnowledgeProvider, KnowledgeResult, Source } from '../types';
 import { PROTOCOLS_CATALOG } from '../services/protocolService';
+import { findBiodecodingMatch } from '../data/biodecodingDatabase';
 
 /**
  * Standard disclaimer mandated across all LUMINA knowledge responses.
@@ -127,6 +128,35 @@ const MOCK_KNOWLEDGE_BASE: MockDatabaseItem[] = [
         name: 'Diccionario de Biodecodificación Práctica',
         reference: 'Capítulo Piel y Contacto: Rostro, límites y protección de la imagen personal',
         relevantExcerpt: 'La pigmentación dérmica como respuesta arcaica de defensa ante agresiones a la dignidad personal.'
+      }
+    ]
+  },
+
+  // Acné y Espinillas
+  {
+    aliases: ['acne', 'acné', 'granos', 'espinillas', 'puntos negros', 'forunculos', 'barros'],
+    title: 'Acné y Espinillas (Miedo al Rechazo y Protección de la Intimidad)',
+    summary:
+      'El acné afecta las glándulas sebáceas de la piel. En biodecodificación refleja el miedo a ser rechazado/a o juzgado/a por la propia imagen, creando una barrera física para mantener a los demás a distancia.',
+    interpretation:
+      'La piel es el órgano con el que entramos en contacto con los demás y con el que nos mostramos al mundo. En biodecodificación, el acné y las espinillas representan un doble conflicto biológico: el miedo al rechazo de la propia imagen (sentir que uno no es agradable, deseable o suficiente) y la necesidad inconsciente de poner una barrera protectora para que los demás "no se acerquen demasiado".\n\nPor ejemplo en la vida diaria: etapas de cambios personales o afectivos donde sentís mucha inseguridad con tu cuerpo, miedo a intimar con otra persona por temor a que descubra tus defectos, o sentirte constantemente observado/a y juzgado/a por tu entorno familiar o laboral. Los granos actúan como un escudo biológico que dice inconscientemente: "No me mires de cerca, no me toques, tengo miedo a ser herido/a".\n\nEl camino de alivio: reconciliarte con tu belleza y tu valor interior. La verdadera atracción y dignidad no nacen de una piel sin marcas, sino de la ternura con la que te tratás a vos mismo/a. Cuando te aceptás y dejás de juzgarte frente al espejo, tu piel ya no necesita levantar barreras inflamatorias para defenderse.',
+    emotionalThemes: [
+      'Miedo al rechazo de la propia imagen',
+      'Inseguridad e intimidad',
+      'Pudor y barrera de protección',
+      'Aceptación y amor propio'
+    ],
+    reflectionQuestions: [
+      '¿En qué momentos o situaciones sentís que tu aspecto físico no es suficiente para ser querido/a o aceptado/a?',
+      '¿Tenés miedo a que alguien se acerque demasiado a tu intimidad y descubra tus inseguridades?',
+      '¿Cómo podés empezar hoy a mirarte al espejo reconociendo todo lo lindo y valioso que hay en vos?'
+    ],
+    relatedProtocolIds: ['pnl-reencuadre', 'mindfulness-somatico', 'anclaje-recursos'],
+    sources: [
+      {
+        name: 'Diccionario de Biodecodificación Práctica',
+        reference: 'Capítulo Piel: Glándulas sebáceas, pudor y conflicto de auto-rechazo estético',
+        relevantExcerpt: 'El acné como defensa biológica frente a la mirada inquisidora y la desvalorización estética.'
       }
     ]
   },
@@ -821,21 +851,11 @@ export class MockKnowledgeProvider implements KnowledgeProvider {
     const risk = evaluateMedicalRisk(cleanQuery);
     const normalized = cleanQuery.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    // Search in mock knowledge base
-    const match = MOCK_KNOWLEDGE_BASE.find((item) => {
-      const normTitle = item.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      return (
-        normTitle.includes(normalized) ||
-        normalized.includes(normTitle) ||
-        item.aliases.some((alias) => {
-          const normAlias = alias.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          return normalized.includes(normAlias) || normAlias.includes(normalized);
-        })
-      );
-    });
+    // Search in comprehensive biodecoding database
+    const match = findBiodecodingMatch(cleanQuery);
 
     if (match) {
-      const protocols = match.relatedProtocolIds
+      const protocols = match.recommendedProtocolIds
         .map((id) => PROTOCOLS_CATALOG.find((p) => p.id === id))
         .filter((p): p is (typeof PROTOCOLS_CATALOG)[0] => Boolean(p));
 
@@ -886,15 +906,64 @@ export class MockKnowledgeProvider implements KnowledgeProvider {
 }
 
 /**
- * NotebookLM / Gemini RAG Knowledge Provider Adapter.
+ * Dynamic Biodecoding Knowledge Provider with full Gemini RAG connection
+ * and offline local library fallback.
  */
 export class GeminiRAGKnowledgeProvider implements KnowledgeProvider {
   private fallbackProvider = new MockKnowledgeProvider();
 
   async search(query: string): Promise<KnowledgeResult> {
-    return this.fallbackProvider.search(query);
+    const cleanQuery = query.trim();
+    if (!cleanQuery) {
+      throw new Error('Por favor introducí un término de búsqueda válido.');
+    }
+
+    const risk = evaluateMedicalRisk(cleanQuery);
+
+    try {
+      const response = await fetch('/api/biodecoding/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: cleanQuery })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const matchedProtocols = (data.recommendedProtocolIds || [])
+        .map((id: string) => PROTOCOLS_CATALOG.find((p) => p.id === id))
+        .filter((p: unknown): p is (typeof PROTOCOLS_CATALOG)[0] => Boolean(p));
+
+      return {
+        query: cleanQuery,
+        title: data.title || cleanQuery,
+        summary: data.summary || '',
+        interpretation: data.interpretation || '',
+        emotionalThemes: Array.isArray(data.emotionalThemes) ? data.emotionalThemes : [],
+        reflectionQuestions: Array.isArray(data.reflectionQuestions) ? data.reflectionQuestions : [],
+        relatedProtocols: matchedProtocols.length > 0 ? matchedProtocols : PROTOCOLS_CATALOG.slice(0, 3),
+        sources: [
+          {
+            name: 'Diccionario de Biodecodificación Práctica',
+            reference: `Compendio Biológico y Psicosomático — ${cleanQuery}`,
+            relevantExcerpt: 'Lectura biológica orientativa sobre el órgano, tejido y conflicto emocional asociado.'
+          }
+        ],
+        disclaimer: STANDARD_DISCLAIMER,
+        isMedicalAlert: risk.isAlert || Boolean(data.isMedicalAlert),
+        alertMessage: risk.alertMessage || data.alertMessage,
+        alertLevel: risk.alertLevel || (data.isMedicalAlert ? 'warning' : 'none'),
+        isDemoContent: false
+      };
+    } catch (err) {
+      console.warn('API biodecoding search failed, falling back to local database:', err);
+      return this.fallbackProvider.search(query);
+    }
   }
 }
 
-// Active provider instance
-export const activeKnowledgeProvider: KnowledgeProvider = new MockKnowledgeProvider();
+// Active provider instance configured to use live Gemini dynamic decoding
+export const activeKnowledgeProvider: KnowledgeProvider = new GeminiRAGKnowledgeProvider();
