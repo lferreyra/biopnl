@@ -24,6 +24,8 @@ import { OfflineIndicatorBanner } from './components/OfflineIndicatorBanner';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
 import { SomaticSOSModal } from './components/SomaticSOSModal';
 import { MindfulNotificationsModal } from './components/MindfulNotificationsModal';
+import { EthicalFrameworkModal } from './components/EthicalFrameworkModal';
+import { EthicalDeclinedView } from './components/EthicalDeclinedView';
 import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
 
@@ -67,6 +69,35 @@ export default function App() {
 
   // Mindful conscious notifications modal state
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  // Ethical & health framework acceptance states
+  const [hasDeclinedEthical, setHasDeclinedEthical] = useState(false);
+  const [isReviewingEthicalModal, setIsReviewingEthicalModal] = useState(false);
+
+  const hasAcceptedEthical = Boolean(user?.acceptedEthicalFramework);
+
+  const handleAcceptEthical = async () => {
+    if (!user) return;
+    const nowIso = new Date().toISOString();
+    const updated = await AuthService.updateUserPreferences({
+      acceptedEthicalFramework: true,
+      acceptedEthicalFrameworkAt: nowIso
+    });
+    if (updated) {
+      setUser(updated);
+    } else {
+      setUser({
+        ...user,
+        acceptedEthicalFramework: true,
+        acceptedEthicalFrameworkAt: nowIso
+      });
+    }
+    setHasDeclinedEthical(false);
+  };
+
+  const handleDeclineEthical = () => {
+    setHasDeclinedEthical(true);
+  };
 
   // Sync auth state
   useEffect(() => {
@@ -159,6 +190,32 @@ export default function App() {
     return <LandingCarouselPage onLoginSuccess={(u) => setUser(u)} />;
   }
 
+  // Right after login, present the Ethical and Health Framework
+  // If declined, user CANNOT enter profile/app and receives full explanation
+  if (!hasAcceptedEthical) {
+    if (hasDeclinedEthical) {
+      return (
+        <EthicalDeclinedView
+          userEmail={user.email}
+          userName={user.name}
+          onReopenModal={() => setHasDeclinedEthical(false)}
+          onSignOut={handleSignOut}
+        />
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-[#FFF9F5] dark:bg-[#140C08] flex items-center justify-center p-4">
+        <EthicalFrameworkModal
+          isOpen={true}
+          isMandatory={true}
+          onAccept={handleAcceptEthical}
+          onDecline={handleDeclineEthical}
+        />
+      </div>
+    );
+  }
+
   const featuredProtocols = ProtocolService.getAll();
 
   return (
@@ -236,6 +293,7 @@ export default function App() {
               onSignOut={handleSignOut}
               searchesCount={searches.length}
               onNavigateToAdmin={() => setCurrentTab('admin')}
+              onViewEthicalFramework={() => setIsReviewingEthicalModal(true)}
             />
           )}
 
@@ -270,6 +328,13 @@ export default function App() {
       <MindfulNotificationsModal
         isOpen={isNotificationsOpen}
         onClose={() => setIsNotificationsOpen(false)}
+      />
+
+      {/* Ethical Framework Review Modal (from Profile or Settings) */}
+      <EthicalFrameworkModal
+        isOpen={isReviewingEthicalModal}
+        isMandatory={false}
+        onClose={() => setIsReviewingEthicalModal(false)}
       />
     </AppShell>
   );

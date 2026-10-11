@@ -12,13 +12,15 @@ interface ProfilePageProps {
   onSignOut: () => void;
   searchesCount: number;
   onNavigateToAdmin?: () => void;
+  onViewEthicalFramework?: () => void;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   user,
   onSignOut,
   searchesCount,
-  onNavigateToAdmin
+  onNavigateToAdmin,
+  onViewEthicalFramework
 }) => {
   const { theme, setTheme } = useTheme();
   const isAdmin = user.role === 'admin' || user.email.toLowerCase() === 'lucas.ferreyra@gmail.com';
@@ -173,6 +175,48 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <p className="text-sm font-bold text-[#111111] dark:text-[#FFF4ED]">
               {searchesCount} de 5 consultas guardadas
             </p>
+          </div>
+        </div>
+
+        {/* Marco Ético y de Salud Card */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-white/5 border border-[#DE673D]/30 dark:border-[#DE673D]/20 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#DE673D]/15 text-[#DE673D] text-[11px] font-bold uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Marco Ético y de Salud</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-[#111111] dark:text-[#FFF4ED]">
+                Compromiso de Bienestar Responsable
+              </h3>
+              <p className="text-xs text-[#5D4E45] dark:text-[#BDB0A8] leading-relaxed">
+                {user.acceptedEthicalFrameworkAt ? (
+                  <>
+                    Aceptado el{' '}
+                    <span className="font-semibold text-[#241915] dark:text-white">
+                      {new Date(user.acceptedEthicalFrameworkAt).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </span>
+                    . Has confirmado que BioPNL es una herramienta complementaria y no sustituye la atención médica profesional.
+                  </>
+                ) : (
+                  'Has aceptado el marco ético y de salud para el uso seguro y responsable de BioPNL.'
+                )}
+              </p>
+            </div>
+
+            {onViewEthicalFramework && (
+              <button
+                type="button"
+                onClick={onViewEthicalFramework}
+                className="shrink-0 px-4 py-2 rounded-full border border-[#DE673D]/40 text-xs font-bold text-[#DE673D] hover:bg-[#DE673D]/10 active:scale-95 transition-all cursor-pointer text-center"
+              >
+                Ver marco ético
+              </button>
+            )}
           </div>
         </div>
 

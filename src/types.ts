@@ -81,6 +81,8 @@ export interface UserProfile {
   protocolsCount?: number;
   status?: 'active' | 'inactive';
   showAnxietySos?: boolean;
+  acceptedEthicalFramework?: boolean;
+  acceptedEthicalFrameworkAt?: string;
 }
 
 export type ThemeMode = 'light' | 'dark';
